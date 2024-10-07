@@ -1,0 +1,32 @@
+#X3D V3.3 utf8
+PROFILE Immersive
+META "description" "Basic expample"
+
+Background {
+    skyColor 1 1 0
+}
+
+Viewpoint {
+    description "frontal view"
+    position 5.99 -6.38 4.80
+    orientation 0.29 0.75 -0.58 1.36
+}
+
+PointLight {
+    color 0 0 1
+    location 0 5 10
+    intensity 0.9
+    ambientIntensity 0.5
+}
+
+Shape {
+    geometry Box {
+        size 1 2 3
+    }
+    appearance Appearance {
+        material Material {
+            diffuseColor 1 0 0
+            specularColor 1 1 1
+        }
+    }
+}
