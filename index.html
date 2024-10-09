@@ -1,6 +1,6 @@
 <html> 
     <head> 
-        <title>My first X3DOM page</title> 			
+        <title>Chess/Draughts</title> 			
         <script type='text/javascript' src='http://www.x3dom.org/download/x3dom.js'> </script> 
         <link rel='stylesheet' type='text/css' href='http://www.x3dom.org/download/x3dom.css'></link> 
 
@@ -37,8 +37,8 @@
                     for (let row = 0; row < rows; row++) {
                         for (let col = 0; col < cols; col++) {
                             const color = (row + col) % 2 === 0 ? '1 1 0.55' : '0 0.7 0.2';
-                            const translationX = col * squareSize - (cols * squareSize) / 2 + squareSize / 2;
-                            const translationZ = row * squareSize - (rows * squareSize) / 2 + squareSize / 2;
+                            const translationX = (col - cols/2) * squareSize
+                            const translationZ = (row - rows/2) * squareSize
     
                             const squareTransform = document.createElement('Transform');
                             squareTransform.setAttribute('translation', `${translationX} 0 ${translationZ}`);
@@ -50,8 +50,23 @@
                                     </appearance>
                                 </shape>
                             `;
-    
                             chessboard.appendChild(squareTransform);
+
+                            const pawnTransform = document.createElement('Transform')
+                            if (row == 0 || row == 1 || row == 6 || row == 7) {
+                                pawnTransform.setAttribute('translation', `${translationX} 0.2 ${translationZ}`);
+                                pawnTransform.innerHTML = `
+                                <shape>
+                                    <Cylinder radius="0.2" height="0.5"></Cylinder>
+                                    <appearance>
+                                        <material diffuseColor="1 0.3 1"></material>
+                                    </appearance>
+                                </shape>
+                                `;
+                            chessboard.appendChild(pawnTransform);
+                            }
+    
+                            
                         }
                     }
                 </script>
