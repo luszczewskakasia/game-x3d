@@ -11,13 +11,10 @@
 
                 <background skyColor='0.5 0.5 0.5'></background>
     
-                <!-- Viewpoint with a description -->
                 <viewpoint description="frontal view" position="0 0 4"></viewpoint>
                 <directionalLight direction="0 -1 -1" intensity="0.8"></directionalLight>
-                <!-- PointLight with blue color -->
                 <!-- <pointlight color='0 0 1' location='0 5 10' intensity='0.9' ambientIntensity='0.5'></pointlight> -->
     
-                <!-- Shape with Box geometry -->
                 <Transform translation='0 -0.05 0'>
                 <shape>
                     <box size='6 0.1 6'></box>
@@ -29,18 +26,23 @@
                 <script type="text/javascript">
                     const chessboard = document.querySelector('scene');
     
-                    const squareSize = 0.5; // Size of each square
-                    const rows = 8;       // Number of rows
-                    const cols = 8;       // Number of columns
+                    const square_size = 0.5; 
+                    const rows = 8;    
+                    const cols = 8;       
     
                     for (let row = 0; row < rows; row++) {
                         for (let col = 0; col < cols; col++) {
-                            const color = (row + col) % 2 === 0 ? '1 1 0.55' : '0 0.7 0.2';
-                            const translationX = col * squareSize - (cols * squareSize) / 2 + squareSize / 2;
-                            const translationZ = row * squareSize - (rows * squareSize) / 2 + squareSize / 2;
+                            let color;
+                            if ((row + col) % 2 === 0) {
+                                color = '1 1 0.55';
+                            } else {
+                                color = '0 0.7 0.2';
+                            }
+                            let translation_x = (col - cols / 2 + 0.5) * square_size;
+                            let translation_z = (row - rows / 2 + 0.5) * square_size;
     
                             const squareTransform = document.createElement('Transform');
-                            squareTransform.setAttribute('translation', `${translationX} 0 ${translationZ}`);
+                            squareTransform.setAttribute('translation', `${translation_x} 0 ${translation_z}`);
                             squareTransform.innerHTML = `
                                 <shape>
                                     <box size='0.5 0.01 0.5'></box>
