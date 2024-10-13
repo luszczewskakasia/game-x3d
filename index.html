@@ -1,8 +1,13 @@
+
 <html>
 <head>
     <title>Chess/Draughts</title>
     <script type='text/javascript' src='http://www.x3dom.org/download/x3dom.js'></script>
     <link rel='stylesheet' type='text/css' href='http://www.x3dom.org/download/x3dom.css'></link>
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+    const socket = io();
+    </script>
 </head>
 <body>
     <h1>Chess/Draughts Board</h1>
@@ -27,6 +32,7 @@
                 </shape>
                 </Transform>
                 <script type="text/javascript">
+                    // tu by się przydało to wrzucić jak osobny skrypt
                     const chessboard = document.querySelector('scene');
     
                     const squareSize = 0.5; // Size of each square
@@ -51,20 +57,29 @@
                             `;
                             chessboard.appendChild(squareTransform);
 
+                            const pawnTransform = document.createElement('Transform')
                             if (row == 1 || row == 6) {
-                                const pawnTransform = document.createElement('transform',id = "pawn-${row}-${column}");
+                                let pawnID = (row === 1) ? `white-pawn-${row}-${col}` : `black-pawn-${row}-${col}`;
+                                pawnTransform.setAttribute('id', pawnID);
+                                var pawnColor = (row === 1) ? '0 0 0' : '1 1 1';
+                                pawnTransform.setAttribute('translation', `${translationX} 0.2 ${translationZ}`);
+                                pawnTransform.setAttribute('onmousedown', `startDragging(this, event);`);
+                                pawnTransform.innerHTML = `
+                                <shape>
+                                    <Cylinder DEF='${pawnID}' radius="0.2" height="0.5"></Cylinder>
+                                    <appearance>
+                                        <material diffuseColor='${pawnColor}'></material>
+                                    </appearance>
+                                </shape>
+                                `;
 
-                                pawnTransform.setAttribute('translation', `${translationX} 0.01 ${translationZ}`);
-                                pawnTransform.setAttribute('scale', '0.2 0.2 0.2');
-                                const inlineElement = document.createElement('inline');
-                                inlineElement.setAttribute('url', 'pionek.x3d');
-
-                                pawnTransform.appendChild(inlineElement);
-                                chessboard.appendChild(pawnTransform);
+                            chessboard.appendChild(pawnTransform);
                             }
+
                         }
                     }
                 </script>
+
 
             </scene>
             </x3d>
@@ -73,11 +88,6 @@
         function rotateObject(angle) {
             document.querySelector('Transform').setAttribute('rotation', '0 1 0 ' + angle);
         }
-    </script>
-
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-    const socket = io();
     </script>
     </body> 
     </html>   
