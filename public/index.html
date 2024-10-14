@@ -8,7 +8,6 @@
     <script src="lib/socket.io-1.2.0.js"></script>
     <script src="lib/jquery-1.11.1.js"></script> 
     <script src="server_client.js"></script>
-    <script src="board.js"></script>
 </head>
 <body>
     <h1>Chess/Draughts Board</h1>
@@ -32,6 +31,52 @@
                     </appearance>
                 </shape>
                 </Transform>
+                <script type="text/javascript">
+                    // tu by się przydało to wrzucić jak osobny skrypt
+                    const chessboard = document.querySelector('scene');
+    
+                    const squareSize = 0.5; // Size of each square
+                    const rows = 8;       // Number of rows
+                    const cols = 8;       // Number of columns
+    
+                    for (let row = 0; row < rows; row++) {
+                        for (let col = 0; col < cols; col++) {
+                            const color = (row + col) % 2 === 0 ? '1 1 0.55' : '0 0.7 0.2';
+                            const translationX = col * squareSize - (cols * squareSize) / 2 + squareSize / 2;
+                            const translationZ = row * squareSize - (rows * squareSize) / 2 + squareSize / 2;
+    
+                            const squareTransform = document.createElement('Transform');
+                            squareTransform.setAttribute('translation', `${translationX} 0 ${translationZ}`);
+                            squareTransform.innerHTML = `
+                                <shape>
+                                    <box size='0.5 0.01 0.5'></box>
+                                    <appearance>
+                                        <material diffuseColor='${color}'></material>
+                                    </appearance>
+                                </shape>
+                            `;
+                            chessboard.appendChild(squareTransform);
+
+                            const pawnTransform = document.createElement('Transform')
+                            if (row == 1 || row == 6) {
+                                let pawnID = (row === 1) ? `white-pawn-${row}-${col}` : `black-pawn-${row}-${col}`;
+                                pawnTransform.setAttribute('id', pawnID);
+                                var pawnColor = (row === 1) ? '0 0 0' : '1 1 1';
+                                pawnTransform.setAttribute('translation', `${translationX} 0.2 ${translationZ}`);
+                                pawnTransform.setAttribute('onmousedown', `startDragging(this, event);`);
+                                pawnTransform.innerHTML = `
+                                <shape>
+                                    <Cylinder DEF='${pawnID}' radius="0.2" height="0.5"></Cylinder>
+                                    <appearance>
+                                        <material diffuseColor='${pawnColor}'></material>
+                                    </appearance>
+                                </shape>
+                                `;
+
+                            chessboard.appendChild(pawnTransform);
+                            }
+                        }
+                    }
                 </script>
 
 

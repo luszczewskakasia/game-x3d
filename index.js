@@ -1,3 +1,4 @@
+
 const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
@@ -5,26 +6,34 @@ const { Server } = require('socket.io');
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server)
 
-// Serve static files from the 'public' folder
+let players = [];
+let observer = [];
+
 app.use(express.static(join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, 'public', 'index.html'));
+  res.sendFile(join(__dirname, '/public/index.html'));
 });
 
 io.on('connection', (socket) => {
-  console.log(socket.client.conn.server.clientsCount + " user connected");
+  let username = null;
+  socket.on('username', (name) => {
+    username = name;
+    if (players.length >= 2){
+      observer.push(username);
+      socket.emit('role', 'observer');
+      console.log('Observer ', username, ' joined the game');
+    } else {
+      players.push(username);
+      socket.emit('role','player');
+      console.log('Player ', username, ' joined the game')
+    }
+  
+    });
+  })
 
-  socket.on('username', (username) => {
-    console.log('User joined with username: ' + username);
-  });
-
-  socket.on('message', (msg) => {
-    console.log('Got message from client: ' + msg);
-  });
-});
 
 server.listen(8080, () => {
   console.log('server running at http://localhost:8080');
