@@ -17,8 +17,12 @@ app.get('/', (req, res) => {
   res.sendFile(join(__dirname, '/public/index.html'));
 });
 
+// słucha sobie połączeń między klientami na serwer
 io.on('connection', (socket) => {
   let username = null;
+  // czeka na dostanie imienia które jest emitowane od tego klienta (socket)
+  // połączenie  do konkretnego klienta z serwera hosta
+  // instancja do konkretnego klienta
   socket.on('username', (name) => {
     username = name;
     if (players.length >= 2){
