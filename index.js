@@ -1,4 +1,3 @@
-
 const express = require('express');
 const { createServer } = require('node:http');
 const { join } = require('node:path');
@@ -39,6 +38,6 @@ io.on('connection', (socket) => {
   })
 
 
-server.listen(8080, () => {
-  console.log('server running at http://localhost:8080');
+server.listen(5000, () => {
+  console.log('server running at http://localhost:5000');
 });
