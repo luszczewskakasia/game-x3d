@@ -60,6 +60,10 @@
                                 pawnTransform.setAttribute('scale', '0.2 0.2 0.2');
                                 const inlineElement = document.createElement('inline');
                                 inlineElement.setAttribute('url', 'pionek.x3d');
+                                inlineElement.setAttribute('color', '0 0 0');
+
+                                console.log(inlineElement);
+
 
                                 pawnTransform.appendChild(inlineElement);
                                 chessboard.appendChild(pawnTransform);
