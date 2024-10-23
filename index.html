@@ -5,41 +5,45 @@
     <link rel='stylesheet' type='text/css' href='http://www.x3dom.org/download/x3dom.css'></link>
 </head>
 <body>
-<h1>Chess/Draughts Board</h1>
-<x3d width="800px" height="600px">
-    <scene>
-        <background skyColor='0.5 0.5 0.5'></background>
+    <h1>Chess/Draughts Board</h1>
+        <x3d width="800px" height="600px">
+            <scene>
 
-        <viewpoint description="frontal view" position="0 2 5" orientation="1 0 0 -0.3"></viewpoint>
-        <navigationInfo type='"NONE"'></navigationInfo>
-
-        <directionalLight direction="0 -1 -1" intensity="0.8"></directionalLight>
-
-        <Transform id="sceneTransform" translation="0 0 0">
-            <Transform translation='0 -0.05 0'>
+                <background skyColor='0.5 0.5 0.5'></background>
+    
+                <viewpoint description="frontal view" position="0 0 4"></viewpoint>
+                <directionalLight direction="0 -1 -1" intensity="0.8"></directionalLight>
+                <!-- <pointlight color='0 0 1' location='0 5 10' intensity='0.9' ambientIntensity='0.5'></pointlight> -->
+    
+                <Transform translation='0 -0.05 0'>
                 <shape>
                     <box size='6 0.1 6'></box>
                     <appearance>
                         <material diffuseColor="0.6 0.3 0.1"></material>
                     </appearance>
                 </shape>
-            </Transform>
-
-            <script type="text/javascript">
-                const chessboard = document.querySelector('#sceneTransform');
-                const squareSize = 0.5;
-                const rows = 8;
-                const cols = 8;
-
-                for (let row = 0; row < rows; row++) {
-                    for (let col = 0; col < cols; col++) {
-                        const color = (row + col) % 2 === 0 ? '1 1 0.55' : '0 0.7 0.2';
-                        const translationX = col * squareSize - (cols * squareSize) / 2 + squareSize / 2;
-                        const translationZ = row * squareSize - (rows * squareSize) / 2 + squareSize / 2;
-
-                        const squareTransform = document.createElement('Transform');
-                        squareTransform.setAttribute('translation', `${translationX} 0 ${translationZ}`);
-                        squareTransform.innerHTML = `
+                </Transform>
+                <script type="text/javascript">
+                    const chessboard = document.querySelector('scene');
+    
+                    const square_size = 0.5; 
+                    const rows = 8;    
+                    const cols = 8;       
+    
+                    for (let row = 0; row < rows; row++) {
+                        for (let col = 0; col < cols; col++) {
+                            let color;
+                            if ((row + col) % 2 === 0) {
+                                color = '1 1 0.55';
+                            } else {
+                                color = '0 0.7 0.2';
+                            }
+                            let translation_x = (col - cols / 2 + 0.5) * square_size;
+                            let translation_z = (row - rows / 2 + 0.5) * square_size;
+    
+                            const squareTransform = document.createElement('Transform');
+                            squareTransform.setAttribute('translation', `${translation_x} 0 ${translation_z}`);
+                            squareTransform.innerHTML = `
                                 <shape>
                                     <box size='0.5 0.01 0.5'></box>
                                     <appearance>
@@ -47,32 +51,30 @@
                                     </appearance>
                                 </shape>
                             `;
-                        chessboard.appendChild(squareTransform);
+                            chessboard.appendChild(squareTransform);
 
-                        // Pionki
-                        if (row == 1 || row == 6) {
-                            const pawnTransform = document.createElement('Transform');
-                            pawnTransform.setAttribute('translation', `${translationX} 0.01 ${translationZ}`);
-                            pawnTransform.setAttribute('scale', '0.2 0.2 0.2');
-                            const inlineElement = document.createElement('inline');
-                            inlineElement.setAttribute('url', 'pionek.x3d');
+                            if (row == 1 || row == 6) {
+                                const pawnTransform = document.createElement('transform',id = "pawn-${row}-${column}");
 
-                            pawnTransform.appendChild(inlineElement);
-                            chessboard.appendChild(pawnTransform);
+                                pawnTransform.setAttribute('translation', `${translationX} 0.01 ${translationZ}`);
+                                pawnTransform.setAttribute('scale', '0.2 0.2 0.2');
+                                const inlineElement = document.createElement('inline');
+                                inlineElement.setAttribute('url', 'pionek.x3d');
+
+                                pawnTransform.appendChild(inlineElement);
+                                chessboard.appendChild(pawnTransform);
+                            }
                         }
                     }
-                }
-            </script>
-        </Transform>
+                </script>
 
-    </scene>
-</x3d>
-<input type="range" min="-1" max="1" step="0.01" value="0" id="rotateSlider" oninput="rotateObject(this.value)">
-<script>
-    function rotateObject(angle) {
-        const sceneTransform = document.querySelector('#sceneTransform');
-        sceneTransform.setAttribute('rotation', '0 1 0 ' + angle);
-    }
-</script>
-</body>
-</html>
+            </scene>
+            </x3d>
+    <input type="range" min="-1" max="1" step="0.01" value="0" id="rotateSlider" oninput="rotateObject(this.value)">
+    <script>
+        function rotateObject(angle) {
+            document.querySelector('Transform').setAttribute('rotation', '0 1 0 ' + angle);
+        }
+    </script>
+    </body> 
+    </html>   

@@ -6,8 +6,8 @@ var fs = require('fs');
 
 const PORT=8080; 
 
-fs.readFile('index.html', function (err, html) {
 
+fs.readFile('index.html', function (err, html) {
     if (err) throw err;    
 
     http.createServer(function(request, response) {  
@@ -21,8 +21,3 @@ fs.readFile('index.html', function (err, html) {
 });
 
 // http://localhost:8080/ <- nasza stronka 
-
-// // Handle requests to the url "/" ( http://localhost:3000/ )
-// server([
-//   get('/', ctx => 'Hello world!')
-// ]);
