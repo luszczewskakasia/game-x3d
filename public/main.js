@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.135.0/examples/jsm/loaders/OBJLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { event } from 'jquery';
 
 function initScene() {
     const scene = new THREE.Scene();
@@ -171,5 +172,19 @@ function initScene() {
 
     renderer.setAnimationLoop(animate);
 }
+
+const raycaster = new THREE.Raycaster();
+const click_mouse = new THREE.Vector2();
+const move_mouse = new THREE.Vector2();
+var draggable = new THREE.Object3D;
+
+window.addEventListener('click', event => {
+    click_mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	click_mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    raycaster.setFromCamera( click_mouse, camera );
+    const intersects = raycaster.intersectObjects( scene.children );
+
+})
 
 initScene();
