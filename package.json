@@ -1,5 +1,13 @@
 {
   "dependencies": {
-    "server": "^1.0.41"
+    "express": "^4.21.1",
+    "jquery": "^3.7.1",
+    "path-to-regexp": "^8.2.0",
+    "server": "^0.0.3",
+    "socket.io": "^4.8.0",
+    "three": "^0.169.0"
+  },
+  "devDependencies": {
+    "vite": "^5.4.10"
   }
 }
