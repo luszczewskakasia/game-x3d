@@ -1,16 +1,16 @@
-import { ChessScene } from "main.js"
 import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.135.0/examples/jsm/loaders/OBJLoader.js';
+import * as THREE from 'three';
 
-class Pieces {
+export class Pieces {
     constructor() {
         this.loader = new OBJLoader();
         this.pawnModelPath = "pionek.obj";
         this.bishopModelPath = "skoczek.obj";
-        this.textureLoader = new THREE.textureLoader();
+        this.textureLoader = new THREE.TextureLoader();
 
     }
 
-    create_pawn()  {
+    create_pawn(row, col, translation_x, translation_z)  {
         const pawnTextureBlack = this.textureLoader.load('Textures_pawn/Obsydian_texture.png'); // Ścieżka do tekstury czarnego pionka
         const pawnNormalMapBlack = this.textureLoader.load('Textures_pawn/Obsydian_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
         const pawnDisplacementMapBlack = this.textureLoader.load('Textures_pawn/Obsydian_texture_Displacment.png')*0.5; // Path to the displacement map texture
@@ -30,26 +30,25 @@ class Pieces {
             roughness: 0.6
         });
 
-        if (row === 1 || row === 6) {
-            this.loader.load(this.pawnModelPath, function (pawn) {
-                pawn.scale.set(0.5, 0.5, 0.5);
-                pawn.position.set(translation_x, 0.5, translation_z);
-                pawn.castShadow = true;
-                pawn.receiveShadow = true;
-                pawn.userData.draggable = true;
-                pawn.userData.name = 'pawn';
-                pawn.traverse(function (child) {
-                    if (child.isMesh) {
-                        child.material = row === 1 ? pawnMaterialBlack : pawnMaterialWhite;
-                    }
-                    board.add(pawn);
-                });
+        this.loader.load(this.pawnModelPath, function (pawn) {
+            pawn.scale.set(0.5, 0.5, 0.5);
+            pawn.position.set(translation_x, 0.5, translation_z);
+            pawn.castShadow = true;
+            pawn.receiveShadow = true;
+            pawn.userData.draggable = true;
+            pawn.userData.name = 'pawn';
+            pawn.traverse(function (child) {
+                if (child.isMesh) {
+                    child.material = row === 1 ? pawnMaterialBlack : pawnMaterialWhite;
+                }
+                // board.add(pawn);
             });
-        }
+        });
+        return pawn;
 
     }
 
-    create_bishop() {
+    create_bishop(row, col, translation_x, translation_z) {
         const bishopTextureBlack = this.textureLoader.load('Textures_bishop/Obsydian_texture.png'); // Ścieżka do tekstury czarnego pionka
         const bishopNormalMapBlack = this.textureLoader.load('Textures_bishop/Obsydian_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
         const bishopDisplacementMapBlack = this.textureLoader.load('Textures_bishop/Obsydian_texture_Displacment.png')*0.5; // Path to the displacement map texture
@@ -69,36 +68,23 @@ class Pieces {
             roughness: 0.6
         });
 
-        if (row === 0 && (col === 2|| col === 5))
-            {
-                this.loader.load(this.bishopModelPath, function (bishop) {
-                    bishop.scale.set(0.5, 0.5, 0.5);
-                    bishop.position.set(translation_x, 0.5, translation_z);
-                    bishop.castShadow = true;
-                    bishop.receiveShadow = true;
-                    bishop.traverse(function (child) {
-                        if (child.isMesh) {
-                            child.material = bishopMaterialBlack;
-                        }
-                        board.add(bishop);
-                    });
+        return new Promise((resolve) => {
+            this.loader.load(this.bishopModelPath, function (bishop) {
+                bishop.scale.set(0.5, 0.5, 0.5);
+                bishop.position.set(translation_x, 0.5, translation_z);
+                bishop.castShadow = true;
+                bishop.receiveShadow = true;
+                bishop.traverse(function (child) {
+                    if (child.isMesh) {
+                        child.material = bishopMaterialBlack;
+                    }
+                    // board.add(bishop);
                 });
-            }
-            if (row === 7 && (col === 2 || col === 5))
-            {
-                this.loader.load(this.bishopModelPath, function (bishop) {
-                    bishop.scale.set(0.5, 0.5, 0.5);
-                    bishop.position.set(translation_x, 0.5, translation_z);
-                    bishop.castShadow = true;
-                    bishop.receiveShadow = true;
-                    bishop.traverse(function (child) {
-                        if (child.isMesh) {
-                            child.material = bishopMaterialWhite;
-                        }
-                        board.add(bishop);
-                    });
-                });
-            }
+                resolve(bishop);
+            });
+    
+
+        });
 
     }
 }
