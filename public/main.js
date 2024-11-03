@@ -144,43 +144,46 @@ class ChessScene {
                 square_mesh.position.set(translation_x, 0.5, translation_z); 
                 board.add(square_mesh);
                 if (row === 1 || row === 6) {
-                    loader.load(pawnModelPath, function (pawn) {
+                    loader.loadAsync(pawnModelPath).then((group) => {
+                        const pawn = group.children[0];
                         pawn.scale.set(0.5, 0.5, 0.5);
                         pawn.position.set(translation_x, 0.5, translation_z);
                         pawn.castShadow = true;
                         pawn.receiveShadow = true;
-                        pawn.userData.draggable = true;
-                        pawn.userData.name = 'pawn';
+
                         pawn.traverse(function (child) {
                             if (child.isMesh) {
                                 child.material = row === 1 ? pawnMaterialBlack : pawnMaterialWhite;
                             }
                         });
+                        pawn.userData.draggable = true;
+                        pawn.userData.name = 'pawn';
                         board.add(pawn);
                     });
+                    // this.createPawn(col, row === 1 ? 'black' : 'white');
                     
                 }
                 if (row === 0 && (col === 2|| col === 5))
                 {
-                    loader.load(bishopModelPath, function (bishop) {
+                    loader.loadAsync(bishopModelPath).then((group) => {
+                        const bishop = group.children[0];
                         bishop.scale.set(0.5, 0.5, 0.5);
                         bishop.position.set(translation_x, 0.5, translation_z);
                         bishop.castShadow = true;
                         bishop.receiveShadow = true;
-                        bishop.userData.draggable = true;
-                        bishop.userData.name = 'bishop';
-                        console.log('bishop');
                         bishop.traverse(function (child) {
                             if (child.isMesh) {
                                 child.material = bishopMaterialBlack;
                             }
                         });
+
                         board.add(bishop);
                     });
                 }
                 if (row === 7 && (col === 2 || col === 5))
                 {
-                    loader.load(bishopModelPath, function (bishop) {
+                    loader.loadAsync(bishopModelPath).then((group) => {
+                        const bishop = group.children[0];
                         bishop.scale.set(0.5, 0.5, 0.5);
                         bishop.position.set(translation_x, 0.5, translation_z);
                         bishop.castShadow = true;
@@ -191,6 +194,10 @@ class ChessScene {
                             }
                             
                         });
+                        bishop.userData.draggable = true;
+                        bishop.userData.name = 'bishop';
+                        console.log(`${bishop.userData.name}`);
+                        console.log(`${bishop.userData.draggable}`);
                         board.add(bishop);
                     });
                 }
@@ -202,6 +209,60 @@ class ChessScene {
 
     }
 
+    
+    // createPawn(col, color) {
+    //     const textureLoader = new THREE.TextureLoader();
+    
+    //     // Load textures for the black pawn
+    //     const pawnTextureBlack = textureLoader.load('Textures_pawn/Obsydian_texture.png'); // Path to the black pawn texture
+    //     const pawnNormalMapBlack = textureLoader.load('Textures_pawn/Obsydian_normal.png'); // Path to the normal map of the black pawn
+    //     const pawnDisplacementMapBlack = textureLoader.load('Textures_pawn/Obsydian_texture_Displacment.png'); // Path to the displacement map texture
+    
+    //     const pawnMaterialBlack = new THREE.MeshStandardMaterial({
+    //         map: pawnTextureBlack,
+    //         normalMap: pawnNormalMapBlack,
+    //         displacementMap: pawnDisplacementMapBlack,
+    //         displacementScale: 0.09, // Set the displacement scale correctly
+    //         metalness: 0.5,
+    //         roughness: 0.78
+    //     });
+    
+    //     // Load textures for the white pawn
+    //     const pawnTextureWhite = textureLoader.load("Textures_pawn/Marble_texture.png"); // Path to the white pawn texture
+    //     const pawnNormalMapWhite = textureLoader.load('Textures_pawn/Marble_normal.png'); // Path to the normal map of the white pawn
+    
+    //     const pawnMaterialWhite = new THREE.MeshStandardMaterial({
+    //         map: pawnTextureWhite,
+    //         normalMap: pawnNormalMapWhite,
+    //         metalness: 0.1,
+    //         roughness: 0.6
+    //     });
+    
+    //     const loader = new OBJLoader();
+    //     const pawnModelPath = "pionek.obj"; // Adjust the path to your pawn model
+    //     loader.loadAsync(pawnModelPath).then((group) => {
+    //         const pawn = group.children[0];
+    //         pawn.scale.set(0.5, 0.5, 0.5);
+    //         pawn.position.set((col - 3.5), 0.5, (color === 'black' ? 1 : 6) - 3.5); // Adjust for position on board
+    //         pawn.castShadow = true;
+    //         pawn.receiveShadow = true;
+    
+    //         // Apply the correct material based on color
+    //         pawn.traverse(function (child) {
+    //             if (child.isMesh) {
+    //                 // Assign the pre-defined materials instead of creating a new one
+    //                 child.material = (color === 'black') ? pawnMaterialBlack : pawnMaterialWhite;
+    //             }
+    //         });
+    
+    //         this.scene.add(pawn);
+    
+    //         pawn.userData.draggable = true;
+    //         pawn.userData.name = 'pawn';
+    //     });
+    // }
+    
+
     init_event_listeners() {
         // window.addEventListener('click', event => this.)
     }
@@ -212,45 +273,9 @@ class ChessScene {
         // scene.rotation.y += 0.01;
         this.renderer.render(this.scene, this.camera);
     }
-    
-    // const raycaster = new THREE.Raycaster();
-    // const click_mouse = new THREE.Vector2();
-    // const move_mouse = new THREE.Vector2();
-    // 
-
-    // move() {
-    //     // var draggable = new THREE.Object3D;
-    //     window.addEventListener('click', event => {
-    //         this.click_mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-    //         this.click_mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-        
-    //         this.raycaster.setFromCamera( this.click_mouse, this.camera );
-    //         const intersects = this.raycaster.intersectObjects(this.scene.children );
-    //         if (intersects.length > 0 && intersects[0].object.userData.draggable) {
-    //             this.draggable = intersects[0].object;
-    //             console.log(`found draggabe ${this.draggable.userData.name}`)
-    //         }
-        
-    //     });
-
-        // window.addEventListener('mousemove', event => {
-        //     if (this.draggable) {
-        //         this.move_mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-        //         this.move_mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-        
-        //         this.raycaster.setFromCamera(this.move_mouse, this.camera);
-        //         const newPosition = raycaster.ray.origin.clone();
-        //         draggable.position.copy(newPosition); 
-        //     }
-        // });
-        
 
         
-        // window.addEventListener('mouseup', () => {
-        //     draggable = null; 
-        // });
-        
-    // }
+
     initEventListeners() {
         window.addEventListener('click', event => this.handleMouseClick(event));
         window.addEventListener('mousemove', event => this.handleMouseMove(event));
@@ -260,23 +285,26 @@ class ChessScene {
     handleMouseClick(event) {
         this.click_mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
         this.click_mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-        
-        this.updateMousePosition(event, this.click_mouse);
+    
         this.raycaster.setFromCamera(this.click_mouse, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children);
         console.log(`${intersects.length}`);
+        console.log(`${intersects[0].object.userData.draggable}`);
 
         if (intersects.length > 0) {
-            this.draggable = intersects[0].object;
-            console.log(`Found draggable: ${this.draggable.userData.name}`);
+            const intersectedObject = intersects[0].object;
+            if (intersectedObject.userData && intersectedObject.userData.draggable) {
+                this.draggable = intersectedObject;
+                console.log(`Found draggable: ${this.draggable.userData.name}`);
+            } else {
+                console.log('object is not draggable');
+            }
         } else {
-            console.log('nothing found');
+            console.log('Nothing found');
         }
-    }
-
+    } 
     handleMouseMove(event) {
         if (this.draggable) {
-            this.updateMousePosition(event, this.move_mouse);
             this.raycaster.setFromCamera(this.move_mouse, this.camera);
             this.draggable.position.copy(this.raycaster.ray.origin);
         }
@@ -284,11 +312,6 @@ class ChessScene {
 
     handleMouseRelease() {
         this.draggable = null;
-    }
-
-    updateMousePosition(event, vector) {
-        vector.x = (event.clientX / window.innerWidth) * 2 - 1;
-        vector.y = - (event.clientY / window.innerHeight) * 2 + 1;
     }
     
 
