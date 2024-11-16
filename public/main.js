@@ -15,13 +15,11 @@ class ChessScene {
         this.is_draggable = false;
 
         this.init_scene();
-        this.initEventListeners();  
+        this.init_event_listeners();  
     }
     init_scene() {
-        // this.addBackground();
         this.create_lightning();
         this.board = this.create_chessboard();
-        // this.loadPieces();
         this.renderer.setAnimationLoop(() => this.animate());
     }
 
@@ -209,24 +207,21 @@ class ChessScene {
     }
 
     animate() {
-        this.drag_object();
-        
+        this.drag_object(); 
         this.renderer.render(this.scene, this.camera);
     }
 
-        
 
-    initEventListeners() {
-        window.addEventListener('click', event => this.handleMouseClick(event));
-        window.addEventListener('mousemove', event => this.handleMouseMove(event));
+    init_event_listeners() {
+        window.addEventListener('click', event => this.handle_mouse_click(event));
+        window.addEventListener('mousemove', event => this.handle_mouse_move(event));
     }
     
-    handleMouseClick(event) {
+    handle_mouse_click(event) {
         if (this.draggable) {
 
             console.log(`Drop draggable: ${this.draggable.userData.name}`);
 
-            // const grid = 0.5;
             const target_pos_x = Math.floor(this.draggable.position.x) + 0.5;
             const target_pos_z = Math.floor(this.draggable.position.z) + 0.5;
 
@@ -237,7 +232,6 @@ class ChessScene {
             console.log(`Dropped at: ${target_pos_x}, ${target_pos_z}`);
             return;
         }
-
 
         this.click_mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.click_mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
@@ -257,7 +251,7 @@ class ChessScene {
         }
     }
 
-    handleMouseMove(event) {
+    handle_mouse_move(event) {
         this.move_mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.move_mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
     }
