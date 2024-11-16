@@ -14,9 +14,7 @@ class ChessScene {
         this.draggable = false;
 
         this.init_scene();
-        // this.init_event_listeners(); 
         this.initEventListeners();  
-        // this.move();
     }
     init_scene() {
         // this.addBackground();
@@ -160,7 +158,6 @@ class ChessScene {
                         pawn.userData.name = 'pawn';
                         board.add(pawn);
                     });
-                    // this.createPawn(col, row === 1 ? 'black' : 'white');
                     
                 }
                 if (row === 0 && (col === 2|| col === 5))
@@ -207,64 +204,6 @@ class ChessScene {
         this.scene.add(board);
         return board;
 
-    }
-
-    
-    // createPawn(col, color) {
-    //     const textureLoader = new THREE.TextureLoader();
-    
-    //     // Load textures for the black pawn
-    //     const pawnTextureBlack = textureLoader.load('Textures_pawn/Obsydian_texture.png'); // Path to the black pawn texture
-    //     const pawnNormalMapBlack = textureLoader.load('Textures_pawn/Obsydian_normal.png'); // Path to the normal map of the black pawn
-    //     const pawnDisplacementMapBlack = textureLoader.load('Textures_pawn/Obsydian_texture_Displacment.png'); // Path to the displacement map texture
-    
-    //     const pawnMaterialBlack = new THREE.MeshStandardMaterial({
-    //         map: pawnTextureBlack,
-    //         normalMap: pawnNormalMapBlack,
-    //         displacementMap: pawnDisplacementMapBlack,
-    //         displacementScale: 0.09, // Set the displacement scale correctly
-    //         metalness: 0.5,
-    //         roughness: 0.78
-    //     });
-    
-    //     // Load textures for the white pawn
-    //     const pawnTextureWhite = textureLoader.load("Textures_pawn/Marble_texture.png"); // Path to the white pawn texture
-    //     const pawnNormalMapWhite = textureLoader.load('Textures_pawn/Marble_normal.png'); // Path to the normal map of the white pawn
-    
-    //     const pawnMaterialWhite = new THREE.MeshStandardMaterial({
-    //         map: pawnTextureWhite,
-    //         normalMap: pawnNormalMapWhite,
-    //         metalness: 0.1,
-    //         roughness: 0.6
-    //     });
-    
-    //     const loader = new OBJLoader();
-    //     const pawnModelPath = "pionek.obj"; // Adjust the path to your pawn model
-    //     loader.loadAsync(pawnModelPath).then((group) => {
-    //         const pawn = group.children[0];
-    //         pawn.scale.set(0.5, 0.5, 0.5);
-    //         pawn.position.set((col - 3.5), 0.5, (color === 'black' ? 1 : 6) - 3.5); // Adjust for position on board
-    //         pawn.castShadow = true;
-    //         pawn.receiveShadow = true;
-    
-    //         // Apply the correct material based on color
-    //         pawn.traverse(function (child) {
-    //             if (child.isMesh) {
-    //                 // Assign the pre-defined materials instead of creating a new one
-    //                 child.material = (color === 'black') ? pawnMaterialBlack : pawnMaterialWhite;
-    //             }
-    //         });
-    
-    //         this.scene.add(pawn);
-    
-    //         pawn.userData.draggable = true;
-    //         pawn.userData.name = 'pawn';
-    //     });
-    // }
-    
-
-    init_event_listeners() {
-        // window.addEventListener('click', event => this.)
     }
 
     animate() {
