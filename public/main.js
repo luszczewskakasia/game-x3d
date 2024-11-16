@@ -12,7 +12,7 @@ class ChessScene {
         this.click_mouse = new THREE.Vector2();
         this.move_mouse = new THREE.Vector2();
         this.draggable = null;
-        this.is_dragging = false;
+        this.is_draggable = false;
 
         this.init_scene();
         this.initEventListeners();  
@@ -209,10 +209,6 @@ class ChessScene {
     }
 
     animate() {
-
-        // scene.rotation.x += 0.01;
-        // scene.rotation.y += 0.01;
-
         this.drag_object();
         
         this.renderer.render(this.scene, this.camera);
@@ -224,53 +220,63 @@ class ChessScene {
         window.addEventListener('click', event => this.handleMouseClick(event));
         window.addEventListener('mousemove', event => this.handleMouseMove(event));
     }
-
+    
     handleMouseClick(event) {
         if (this.draggable) {
-            console.log(`drop draggable ${this.draggable.userData.name}`)
-            this.draggable = null;
+
+            console.log(`Drop draggable: ${this.draggable.userData.name}`);
+
+            // const grid = 0.5;
+            const target_pos_x = Math.floor(this.draggable.position.x) + 0.5;
+            const target_pos_z = Math.floor(this.draggable.position.z) + 0.5;
+
+            this.draggable.position.set(target_pos_x, 0.5, target_pos_z);
+
+            this.draggable = null; 
+            this.is_draggable = false;
+            console.log(`Dropped at: ${target_pos_x}, ${target_pos_z}`);
             return;
         }
-        this.click_mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        this.click_mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    
+
+
+        this.click_mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.click_mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
         this.raycaster.setFromCamera(this.click_mouse, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children);
-        console.log(`${intersects.length}`);
-        console.log(`${intersects[0].object.userData.draggable}`);
 
         if (intersects.length > 0) {
             const intersectedObject = intersects[0].object;
             if (intersectedObject.userData && intersectedObject.userData.draggable) {
                 this.draggable = intersectedObject;
                 console.log(`Found draggable: ${this.draggable.userData.name}`);
+                this.is_draggable = true;
             }
         } else {
             console.log('Nothing found');
         }
-    } 
-    handleMouseMove(event) {
-        this.move_mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-        this.move_mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    }
 
+    handleMouseMove(event) {
+        this.move_mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        this.move_mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
     }
 
     drag_object() {
-        if (this.draggable) {
-            this.raycaster.setFromCamera(this.move_mouse, this.camera)
-            const intersects = this.raycaster.intersectObjects(this.board.children)
+        if (this.is_draggable && this.draggable) {
+            this.raycaster.setFromCamera(this.move_mouse, this.camera);
+            const intersects = this.raycaster.intersectObjects(this.board.children);
+            
             if (intersects.length > 0) {
                 for (let obj of intersects) {
-                    if (!obj.object.userData.ground) 
-                        continue
-                    
-                    const grid = 0.5;
-                    this.draggable.position.x = Math.round(obj.point.x/grid) * grid;
-                    this.draggable.position.z = Math.round(obj.point.z/grid) * grid;
+                    if (!obj.object.userData.ground) continue;
+
+                    this.draggable.position.x = obj.point.x
+                    this.draggable.position.z = obj.point.z
+
                 }
             }
         }
-
     }
     
 
