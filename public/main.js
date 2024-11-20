@@ -1,6 +1,11 @@
 import * as THREE from 'three';
 import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.135.0/examples/jsm/loaders/OBJLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import * as tex from './textures.js';
+import * as pieces from './pieces.js';
+
+let board;
+
 
 class ChessScene {
     constructor() {
@@ -14,7 +19,9 @@ class ChessScene {
         this.draggable = null;
         this.is_draggable = false;
 
+
         this.init_scene();
+
         this.init_event_listeners();  
     }
     init_scene() {
@@ -23,15 +30,18 @@ class ChessScene {
         this.renderer.setAnimationLoop(() => this.animate());
     }
 
-    create_camera() {
-        const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 1000 );
-        camera.position.y = 5;
-        camera.position.x = 7;
-        camera.lookAt(0, 0, 0);
-        return camera;
-    }
 
-    create_controls() {
+        create_camera()
+        {
+            const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 1000 );
+            camera.position.y = 5;
+            camera.position.x = 7;
+            camera.lookAt(0, 0, 0);
+            return camera;
+        }
+
+    create_controls()
+    {
         var controls;
 
         controls = new OrbitControls(this.camera, this.renderer.domElement)
@@ -69,71 +79,36 @@ class ChessScene {
         this.scene.add(light, pointLight);
     }
 
-    create_chessboard() {
-
+    create_chessboard()
+    {
+        const board = new THREE.Group();
         const loader = new OBJLoader();
         const pawnModelPath = "pionek.obj";
         const bishopModelPath = "skoczek.obj";
+        const towerModelPath = "wieza.obj";
+        const kingModelPath = "krol.obj";
+        const queenModelPath = "krolowka.obj";
+        const horseModelPath = "konik.obj";
+
         const textureLoader = new THREE.TextureLoader();
+        const square_mesh = new THREE.BoxGeometry(2, 1, 1);
+        const Black_roughness = 0.5
+        const Black_metalness = 0.0
+        const White_roughness = 0.8
+        const White_metalness = 0.1
 
-        /// Wczytanie tekstur pionka
-        const pawnTextureBlack = textureLoader.load('Textures_pawn/Obsydian_texture.png'); // Ścieżka do tekstury czarnego pionka
-        const pawnNormalMapBlack = textureLoader.load('Textures_pawn/Obsydian_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
-        const pawnDisplacementMapBlack = textureLoader.load('Textures_pawn/Obsydian_texture_Displacment.png')*0.5; // Path to the displacement map texture
-        const pawnMaterialBlack = new THREE.MeshStandardMaterial({
-            map: pawnTextureBlack,
-            normalMap: pawnNormalMapBlack,
-            displacementMap: pawnDisplacementMapBlack,
-            metalness: 0.5,
-            roughness: 0.78
-        });
-        const pawnTextureWhite = textureLoader.load("Textures_pawn/Marble_texture.png"); // Ścieżka do tekstury czarnego pionka
-        const pawnNormalMapWhite = textureLoader.load('Textures_pawn/Marble_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
-        const pawnMaterialWhite = new THREE.MeshStandardMaterial({
-            map: pawnTextureWhite,
-            normalMap: pawnNormalMapWhite,
-            metalness: 0.1,
-            roughness: 0.6
-        });
-    
-    
-        /// Wczytanie tekstur skoczka
-        const bishopTextureBlack = textureLoader.load('Textures_bishop/Obsydian_texture.png'); // Ścieżka do tekstury czarnego pionka
-        const bishopNormalMapBlack = textureLoader.load('Textures_bishop/Obsydian_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
-        const bishopDisplacementMapBlack = textureLoader.load('Textures_bishop/Obsydian_texture_Displacment.png')*0.5; // Path to the displacement map texture
-        const bishopMaterialBlack = new THREE.MeshStandardMaterial({
-            map: bishopTextureBlack,
-            normalMap: bishopNormalMapBlack,
-            displacementMap: bishopDisplacementMapBlack,
-            metalness: 0.5,
-            roughness: 0.78
-        });
-        const bishopTextureWhite = textureLoader.load("Textures_bishop/Marble_texture.png"); // Ścieżka do tekstury czarnego pionka
-        const bishopNormalMapWhite = textureLoader.load('Textures_bishop/Marble_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
-        const bishopMaterialWhite = new THREE.MeshStandardMaterial({
-            map: bishopTextureWhite,
-            normalMap: bishopNormalMapWhite,
-            metalness: 0.1,
-            roughness: 0.6
-        });
+        const rows = 8;
+        const cols = 8;
+        const square_size = 1.0
+        const square_geo = new THREE.BoxGeometry(2, 1, 1);
+        const green = new THREE.Color(0x00ff00);
+        const yellow = new THREE.Color(0xffff00);
+        const color = new THREE.Color(0xffff00);
 
-        const background_geo = new THREE.BoxGeometry(9, 1, 9); 
-        const background_material = new THREE.MeshBasicMaterial({ color: 0x964B00 });
-        const background_cube = new THREE.Mesh(background_geo, background_material);
-        this.scene.add(background_cube);
-
-        const square_size = 1; 
-        const rows = 8;       
-        const cols = 8;  
-        const square_geo = new THREE.BoxGeometry(square_size, 0.1, square_size);
-        const white = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const black = new THREE.MeshBasicMaterial({ color: 0x000000 });
-        const green = new THREE.MeshBasicMaterial({ color: 0x0b4f1d });
-        const yellow = new THREE.MeshBasicMaterial({ color: 0xc2c28c });
-        const board = new THREE.Group(); 
-
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < cols; col++) {
+        for (let row = 0; row < rows; row++)
+        {
+            for (let col = 0; col < cols; col++)
+            {
                 const color = (row + col) % 2 === 0 ? green : yellow;
                 const square_mesh = new THREE.Mesh(square_geo, color);
                 const translation_x = (col - (cols - 1)/ 2) * square_size; 
@@ -142,26 +117,29 @@ class ChessScene {
                 square_mesh.userData.ground = true;
                 board.add(square_mesh);
                 if (row === 1 || row === 6) {
-                    loader.loadAsync(pawnModelPath).then((group) => {
-                        const pawn = group.children[0];
-                        pawn.scale.set(0.5, 0.5, 0.5);
-                        pawn.position.set(translation_x, 0.5, translation_z);
-                        pawn.castShadow = true;
-                        pawn.receiveShadow = true;
-
-                        pawn.traverse(function (child) {
-                            if (child.isMesh) {
-                                child.material = row === 1 ? pawnMaterialBlack : pawnMaterialWhite;
-                            }
-                        });
-                        pawn.userData.draggable = true;
-                        pawn.userData.name = 'pawn';
-                        board.add(pawn);
+                    // loader.loadAsync(pawnModelPath).then((group) => {
+                    //     const pawn = group.children[0];
+                    //     pawn.scale.set(0.5, 0.5, 0.5);
+                    //     pawn.position.set(translation_x, 0.5, translation_z);
+                    //     pawn.castShadow = true;
+                    //     pawn.receiveShadow = true;
+                    //
+                    //     pawn.traverse(function (child) {
+                    //         if (child.isMesh) {
+                    //             child.material = row === 1 ? tex.pawnMaterialBlack : tex.pawnMaterialWhite;
+                    //         }
+                    //     });
+                    //     pawn.userData.draggable = true;
+                    //     pawn.userData.name = 'pawn';
+                    //     board.add(pawn);
+                    // });
+                    pieces.PawnCreator.createPiece("Black", row, col, translation_x, translation_z, board)
+                    .then(pawn => {
+                        console.log(pawn);  // Twój pionek został stworzony i dodany do sceny
                     });
-                    
+
                 }
-                if (row === 0 && (col === 2|| col === 5))
-                {
+                if ((row === 0 || row === 7 )&& (col === 2 || col === 5)) {
                     loader.loadAsync(bishopModelPath).then((group) => {
                         const bishop = group.children[0];
                         bishop.scale.set(0.5, 0.5, 0.5);
@@ -170,26 +148,8 @@ class ChessScene {
                         bishop.receiveShadow = true;
                         bishop.traverse(function (child) {
                             if (child.isMesh) {
-                                child.material = bishopMaterialBlack;
+                                child.material = row === 0 ? tex.bishopMaterialBlack : tex.bishopMaterialWhite;
                             }
-                        });
-
-                        board.add(bishop);
-                    });
-                }
-                if (row === 7 && (col === 2 || col === 5))
-                {
-                    loader.loadAsync(bishopModelPath).then((group) => {
-                        const bishop = group.children[0];
-                        bishop.scale.set(0.5, 0.5, 0.5);
-                        bishop.position.set(translation_x, 0.5, translation_z);
-                        bishop.castShadow = true;
-                        bishop.receiveShadow = true;
-                        bishop.traverse(function (child) {
-                            if (child.isMesh) {
-                                child.material = bishopMaterialWhite;
-                            }
-                            
                         });
                         bishop.userData.draggable = true;
                         bishop.userData.name = 'bishop';
@@ -198,13 +158,84 @@ class ChessScene {
                         board.add(bishop);
                     });
                 }
+
+                if ((row === 0 || row === 7 )&& (col === 7 || col === 0)) {
+                    loader.loadAsync(towerModelPath).then((group) => {
+                        const tower = group.children[0];
+                        tower.scale.set(0.5, 0.5, 0.5);
+                        tower.position.set(translation_x, 0.5, translation_z);
+                        tower.castShadow = true;
+                        tower.receiveShadow = true;
+                        tower.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material = row === 0 ? tex.towerMaterialBlack : tex.towerMaterialWhite;
+                            }
+                        });
+                        board.add(tower);
+                    });
+                }
+
+                if (col === 4 && (row === 7 || row === 0)){
+                    loader.loadAsync(kingModelPath).then((group) =>  {
+                        const king = group.children[0];
+                        king.scale.set(0.5, 0.5, 0.5);
+                        king.position.set(translation_x, 0.5, translation_z);
+                        king.castShadow = true;
+                        king.receiveShadow = true;
+                        king.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material[1] = tex.king_satin;
+                                child.material[2] = tex.king_gold;
+                                child.material[0] = row === 0 ? tex.king_obsidian : tex.king_marble;
+                            }
+                        });
+                        board.add(king);
+                    });
+                }
+
+                if (col === 3 && (row === 7 || row === 0)){
+                    loader.loadAsync(queenModelPath).then((group) =>  {
+                        const queen = group.children[0];
+                        queen.scale.set(0.5, 0.5, 0.5);
+                        queen.position.set(translation_x, 0.5, translation_z);
+                        queen.castShadow = true;
+                        queen.receiveShadow = true;
+                        queen.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material[2] = tex.queen_satin;
+                                child.material[0] = tex.queen_gold;
+                                child.material[1] = row === 0 ? tex.queen_obsidian : tex.queen_marble;
+                            }
+                        });
+                        board.add(queen);
+                    });
+                }
+
+                if ((row === 0 || row === 7) && (col === 6 || col === 1)){
+                    loader.loadAsync(horseModelPath).then((group) =>  {
+                        const horse = group.children[0];
+                        horse.scale.set(0.5, 0.5, 0.5);
+                        horse.position.set(translation_x, 0.5, translation_z);
+                        horse.castShadow = true;
+                        horse.receiveShadow = true;
+                        horse.traverse(function (child) {
+                            if (child.isMesh) {
+                                child.material[0] = row ===0 ? tex.horse_obsidian : tex.horse_marble;
+                                child.material[1] = tex.horse_gold;
+                                child.material[2] = row === 0 ? tex.horse_obsidian_m : tex.horse_marble_o;
+                            }
+                        });
+                        board.add(horse);
+                    });
+                }
+
+
+                this.scene.add(board);
             }
         }
-    
-        this.scene.add(board);
         return board;
-
     }
+
 
     animate() {
         this.drag_object(); 
@@ -272,7 +303,6 @@ class ChessScene {
             }
         }
     }
-    
 
 }
 
