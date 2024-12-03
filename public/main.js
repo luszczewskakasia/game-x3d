@@ -179,7 +179,7 @@ class ChessScene {
             const target_pos_z = Math.floor(this.draggable.position.z) + 0.5;
 
             this.draggable.position.set(target_pos_x, 0.5, target_pos_z);
-
+            this.draggable.material.emissive.set(0x000000);
             this.draggable = null; 
             this.is_draggable = false;
             console.log(`Dropped at: ${target_pos_x}, ${target_pos_z}`);
@@ -194,11 +194,12 @@ class ChessScene {
 
         if (intersects.length > 0) {
             const intersectedObject = intersects[0].object;
-            intersectedObject.material.emissive.set(0xff0000);
             if (intersectedObject.userData && intersectedObject.userData.draggable) {
+                
                 this.draggable = intersectedObject;
                 console.log(`Found draggable: ${this.draggable.userData.name}`);
                 this.is_draggable = true;
+                this.draggable.material.emissive.set(0xff0000);
             }
         } else {
             console.log('Nothing found');
@@ -208,6 +209,28 @@ class ChessScene {
     handle_mouse_move(event) {
         this.move_mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.move_mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        // const intersects = this.raycaster.intersectObjects(this.scene.children);
+
+        // if (intersects.length > 0) {
+        //     const intersectedObject = intersects[0].object;
+
+        //     // If it's a valid object and the object has been hovered previously
+        //     if (this.lastHoveredObject && this.lastHoveredObject !== intersectedObject) {
+        //         // Reset the emissive color of the previously hovered object
+                
+        //     }
+
+        //     // Change the color of the currently hovered object
+        //     intersectedObject.material.emissive.set(0xff0000);
+
+        //     // Update the last hovered object
+        //     this.lastHoveredObject = intersectedObject;
+        // } else {
+        //     // If nothing is intersected, reset the emissive color of the last hovered object
+        //     if (this.lastHoveredObject) {
+        //         this.lastHoveredObject.material.emissive.set(0x000000);
+        //     }
+        // }
 
     }
 
