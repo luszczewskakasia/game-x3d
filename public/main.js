@@ -194,6 +194,7 @@ class ChessScene {
 
         if (intersects.length > 0) {
             const intersectedObject = intersects[0].object;
+            intersectedObject.material.emissive.set(0xff0000);
             if (intersectedObject.userData && intersectedObject.userData.draggable) {
                 this.draggable = intersectedObject;
                 console.log(`Found draggable: ${this.draggable.userData.name}`);
@@ -207,6 +208,7 @@ class ChessScene {
     handle_mouse_move(event) {
         this.move_mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.move_mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+
     }
 
     drag_object() {
