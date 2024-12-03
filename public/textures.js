@@ -50,21 +50,21 @@ export const bishopMaterialWhite = new THREE.MeshStandardMaterial({
     roughness: White_roughness
 });
 
-const towerTextureBlack = textureLoader.load('Textures_tower/Obsydian_texture.png'); // Ścieżka do tekstury czarnego pionka
-const towerNormalMapBlack = textureLoader.load('Textures_tower/Obsydian_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
-const towerDisplacementMapBlack = textureLoader.load('Textures_tower/Obsydian_texture_Displacment.png')*0.5; // Path to the displacement map texture
-export const towerMaterialBlack = new THREE.MeshStandardMaterial({
-    map: towerTextureBlack,
-    normalMap: towerNormalMapBlack,
-    displacementMap: towerDisplacementMapBlack,
+const rookTextureBlack = textureLoader.load('Textures_rook/Obsydian_texture.png'); // Ścieżka do tekstury czarnego pionka
+const rookNormalMapBlack = textureLoader.load('Textures_rook/Obsydian_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
+const rookDisplacementMapBlack = textureLoader.load('Textures_rook/Obsydian_texture_Displacment.png')*0.5; // Path to the displacement map texture
+export const rookMaterialBlack = new THREE.MeshStandardMaterial({
+    map: rookTextureBlack,
+    normalMap: rookNormalMapBlack,
+    displacementMap: rookDisplacementMapBlack,
     metalness: Black_metalness,
     roughness: Black_roughness
 });
-const towerTextureWhite = textureLoader.load("Textures_tower/Marble_texture.png"); // Ścieżka do tekstury czarnego pionka
-const towerNormalMapWhite = textureLoader.load('Textures_tower/Marble_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
-export const towerMaterialWhite = new THREE.MeshStandardMaterial({
-    map: towerTextureWhite,
-    normalMap: towerNormalMapWhite,
+const rookTextureWhite = textureLoader.load("Textures_rook/Marble_texture.png"); // Ścieżka do tekstury czarnego pionka
+const rookNormalMapWhite = textureLoader.load('Textures_rook/Marble_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
+export const rookMaterialWhite = new THREE.MeshStandardMaterial({
+    map: rookTextureWhite,
+    normalMap: rookNormalMapWhite,
     metalness: White_metalness,
     roughness: White_roughness
 });
@@ -191,63 +191,63 @@ export const queen_marble = new THREE.MeshStandardMaterial({
 });
 
 //White
-// horse mat1
-const diffuse_Whorse_mat1 = textureLoader.load('Textures_horse/White/Material_1/Material_1_White_horse_diffuse.png');
-const normal_Whorse_mat1= textureLoader.load('Textures_horse/White/Material_1/Material_1_White_horse_normal.png');
-const displace_Whorse_mat1 = textureLoader.load('Textures_horse/White/Material_1/Material_1_White_horse_displace.png')*0.5;
-// horse mat2
-const diffuse_Whorse_mat2 = textureLoader.load('Textures_horse/White/Material_2/Material_2_White_horse_diffuse.png');
-const normal_Whorse_mat2= textureLoader.load('Textures_horse/White/Material_2/Material_2_White_horse_normal.png');
-const displace_Whorse_mat2 = textureLoader.load('Textures_horse/White/Material_2/Material_2_White_horse_displace.png')*0.5;
-// horse mat3
-const diffuse_Whorse_mat3 = textureLoader.load('Textures_horse/White/Material_3/Material_3_White_horse_diffuse.png');
-const normal_Whorse_mat3= textureLoader.load('Textures_horse/White/Material_3/Material_3_White_horse_normal.png');
-const displace_Whorse_mat3 = textureLoader.load('Textures_horse/White/Material_3/Material_3_White_horse_displace.png')*0.5;
+// knight mat1
+const diffuse_Wknight_mat1 = textureLoader.load('Textures_knight/White/Material_1/Material_1_White_knight_diffuse.png');
+const normal_Wknight_mat1= textureLoader.load('Textures_knight/White/Material_1/Material_1_White_knight_normal.png');
+const displace_Wknight_mat1 = textureLoader.load('Textures_knight/White/Material_1/Material_1_White_knight_displace.png')*0.5;
+// knight mat2
+const diffuse_Wknight_mat2 = textureLoader.load('Textures_knight/White/Material_2/Material_2_White_knight_diffuse.png');
+const normal_Wknight_mat2= textureLoader.load('Textures_knight/White/Material_2/Material_2_White_knight_normal.png');
+const displace_Wknight_mat2 = textureLoader.load('Textures_knight/White/Material_2/Material_2_White_knight_displace.png')*0.5;
+// knight mat3
+const diffuse_Wknight_mat3 = textureLoader.load('Textures_knight/White/Material_3/Material_3_White_knight_diffuse.png');
+const normal_Wknight_mat3= textureLoader.load('Textures_knight/White/Material_3/Material_3_White_knight_normal.png');
+const displace_Wknight_mat3 = textureLoader.load('Textures_knight/White/Material_3/Material_3_White_knight_displace.png')*0.5;
 //Black
-// horse mat1
-const diffuse_Bhorse_mat1 = textureLoader.load('Textures_horse/Black/Material_1/Material_1_Black_horse_diffuse.png');
-const normal_Bhorse_mat1= textureLoader.load('Textures_horse/Black/Material_1/Material_1_Black_horse_normal.png');
-const displace_Bhorse_mat1 = textureLoader.load('Textures_horse/Black/Material_1/Material_1_Black_horse_displace.png')*0.5;
-// horse mat3
-const diffuse_Bhorse_mat3 = textureLoader.load('Textures_horse/Black/Material_3/Material_3_Black_horse_diffuse.png');
-const normal_Bhorse_mat3= textureLoader.load('Textures_horse/Black/Material_3/Material_3_Black_horse_normal.png');
-const displace_Bhorse_mat3 = textureLoader.load('Textures_horse/Black/Material_3/Material_3_Black_horse_displace.png')*0.5;
+// knight mat1
+const diffuse_Bknight_mat1 = textureLoader.load('Textures_knight/Black/Material_1/Material_1_Black_knight_diffuse.png');
+const normal_Bknight_mat1= textureLoader.load('Textures_knight/Black/Material_1/Material_1_Black_knight_normal.png');
+const displace_Bknight_mat1 = textureLoader.load('Textures_knight/Black/Material_1/Material_1_Black_knight_displace.png')*0.5;
+// knight mat3
+const diffuse_Bknight_mat3 = textureLoader.load('Textures_knight/Black/Material_3/Material_3_Black_knight_diffuse.png');
+const normal_Bknight_mat3= textureLoader.load('Textures_knight/Black/Material_3/Material_3_Black_knight_normal.png');
+const displace_Bknight_mat3 = textureLoader.load('Textures_knight/Black/Material_3/Material_3_Black_knight_displace.png')*0.5;
 
 
-export const horse_obsidian= new THREE.MeshStandardMaterial({
-    map: diffuse_Bhorse_mat1,
-    normalMap:normal_Bhorse_mat1,
-    displacementMap: displace_Bhorse_mat1,
+export const knight_obsidian= new THREE.MeshStandardMaterial({
+    map: diffuse_Bknight_mat1,
+    normalMap:normal_Bknight_mat1,
+    displacementMap: displace_Bknight_mat1,
     metalness: Black_metalness,
     roughness: Black_roughness
 });
-export const horse_obsidian_m= new THREE.MeshStandardMaterial({
-    map: diffuse_Bhorse_mat3,
-    normalMap:normal_Bhorse_mat3,
-    displacementMap: displace_Bhorse_mat3,
+export const knight_obsidian_m= new THREE.MeshStandardMaterial({
+    map: diffuse_Bknight_mat3,
+    normalMap:normal_Bknight_mat3,
+    displacementMap: displace_Bknight_mat3,
     metalness: White_metalness,
     roughness: White_roughness
 
 });
-export const horse_gold = new THREE.MeshStandardMaterial({
-    map: diffuse_Whorse_mat2,
-    normalMap:normal_Whorse_mat2,
-    displacementMap: displace_Whorse_mat2,
+export const knight_gold = new THREE.MeshStandardMaterial({
+    map: diffuse_Wknight_mat2,
+    normalMap:normal_Wknight_mat2,
+    displacementMap: displace_Wknight_mat2,
     metalness: 0.95,
     roughness: 0.1
 });
 
-export const horse_marble = new THREE.MeshStandardMaterial({
-    map: diffuse_Whorse_mat1,
-    normalMap:normal_Whorse_mat1,
-    displacementMap: displace_Whorse_mat1,
+export const knight_marble = new THREE.MeshStandardMaterial({
+    map: diffuse_Wknight_mat1,
+    normalMap:normal_Wknight_mat1,
+    displacementMap: displace_Wknight_mat1,
     metalness: White_metalness,
     roughness: White_roughness
 });
-export const horse_marble_o = new THREE.MeshStandardMaterial({
-    map: diffuse_Whorse_mat3,
-    normalMap:normal_Whorse_mat3,
-    displacementMap: displace_Whorse_mat3,
+export const knight_marble_o = new THREE.MeshStandardMaterial({
+    map: diffuse_Wknight_mat3,
+    normalMap:normal_Wknight_mat3,
+    displacementMap: displace_Wknight_mat3,
     metalness: Black_metalness,
     roughness: Black_roughness
 });

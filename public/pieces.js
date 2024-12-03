@@ -1,245 +1,199 @@
 import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.135.0/examples/jsm/loaders/OBJLoader.js';
 import * as THREE from 'three';
 import * as tex from './textures.js';
+// import * as main from './main';
 
-
-
+// const board = main.board
 
 const loader = new OBJLoader();
 const pawnModelPath = "pionek.obj";
 const bishopModelPath = "skoczek.obj";
-const towerModelPath = "wieza.obj";
+const rookModelPath = "wieza.obj";
 const kingModelPath = "krol.obj";
 const queenModelPath = "krolowka.obj";
-const horseModelPath = "konik.obj";
+const knightModelPath = "konik.obj";
+
 
 
 export class Piece {
-    constructor(color, row, column, model3D,type) {
+    constructor(type, color, row, column) {
         if (new.target === Piece) {
             throw new Error("Cannot instantiate an abstract class.");
         }
-        this.type = this.constructor.name.toLowerCase(); // Nazwa klasy jako typ
-        this.row = row;         // Wiersz na planszy
-        this.column = column;   // Kolumna na planszy
-        this.color = color
-        this.model3D = model3D
+        this.type = this.constructor.name.toLowerCase();
+        this.row = row;
+        this.column = column;
+        this.color = color;
+        const square_size = 1;
+        const translation_x = (column - 7/ 2) * square_size;
+        const translation_z = (row - 7/ 2) * square_size;
+        // this.model3D = this.createPiece(type,color,row,column,translation_x,translation_z);
+
     }
 
     move_rules() {
         throw new Error("Abstract method 'move_rules' must be implemented in derived class.");
     }
 
-    static async createPiece(color, row, column, translation_x, translation_z, board) {}
+    static async createPiece(type, color, row, column, translation_x, translation_z, board) {
 
-}
+        let Model3D;
+        let tex_layers;
+        let textures;
 
-export class Pawn extends Piece {
+        switch (type.toLowerCase()) {
+
+            case "queen":
+                Model3D = queenModelPath;
+                tex_layers = 3;
+                textures = [tex.queen_gold,color === "white" ? tex.queen_obsidian : tex.queen_marble,tex.queen_satin];
+                break;
+
+            case "king":
+                Model3D = kingModelPath;
+                tex_layers = 3;
+                textures = [color === "white" ? tex.king_obsidian : tex.king_marble,tex.king_satin,tex.king_gold];
+                break;
+            case "bishop":
+                Model3D = bishopModelPath;
+                tex_layers = 1;
+                textures = [color === "white" ? tex.bishopMaterialBlack : tex.bishopMaterialWhite];
+                break;
+            case "knight":
+                Model3D = knightModelPath;
+                tex_layers = 3;
+                textures = [color === "white" ? tex.knight_obsidian : tex.knight_marble,tex.knight_gold,color === "white" ? tex.knight_obsidian_m : tex.knight_marble_o];
+                break;
+            case "pawn":
+                Model3D = pawnModelPath;
+                tex_layers = 1;
+                textures = [color === "white" ? tex.pawnMaterialBlack : tex.pawnMaterialWhite];
+                break;
+            case "rook":
+                Model3D = rookModelPath;
+                tex_layers = 1;
+                textures = [color === "white" ? tex.rookMaterialBlack : tex.rookMaterialWhite];
+                break;
+
+            default:
+                throw new Error(`Unsupported piece type: ${type}`);
+        }
 
 
 
-    constructor(color, row, column, model3D,type) {
-        super(color, row, column, model3D,type);
+        return loader.loadAsync(Model3D).then((group) => {
+            const piece = group.children[0];
+            piece.scale.set(0.5, 0.5, 0.5);
+            piece.position.set(translation_x, 0.5, translation_z);
+            piece.castShadow = true;
+            piece.receiveShadow = true;
+            piece.traverse(function (child) {
+                if (child.isMesh) {
+                    if(tex_layers === 1)
+                    {
+                        child.material =textures[0];
+                    }
+                    else
+                    {
+                        for (let l = 0; l < tex_layers; l++)
+                        {
+                            child.material[l] =textures[l];
+                        }
+                    }
 
-    }
+                }
+            });
+            piece.userData.draggable = true;
+            piece.userData.name = type.toLowerCase();
 
-    move_rules() {
-        return "Rook can move horizontally or vertically any number of squares.";
-    }
-}
-export class PawnCreator {
-    static async createPiece(color, row, column, translation_x, translation_z, board) {
-        const group = await loader.loadAsync(pawnModelPath);
-        const pawn = group.children[0];
-        pawn.scale.set(0.5, 0.5, 0.5);
-        pawn.position.set(translation_x, 0.5, translation_z);
-        pawn.castShadow = true;
-        pawn.receiveShadow = true;
+            board.add(piece);
+            switch(type.toLowerCase())
+            {
+                case "queen":
+                    return new Queen(color, row, column, piece);
+                case "king":
+                    return new King(color, row, column, piece);
+                case "bishop":
+                    return new Bishop(color, row, column, piece);
+                case "knight":
+                    return new Knight(color, row, column, piece);
+                case "pawn":
+                    return new Pawn(color, row, column, piece);
+                case "rook":
+                    return new Rook(color, row, column, piece);
+                default:
+                    throw new Error(`Unsupported piece type: ${type}`);
 
-        pawn.traverse(function (child) {
-            if (child.isMesh) {
-                child.material = row === 1 ? tex.pawnMaterialBlack : tex.pawnMaterialWhite;
             }
         });
 
-        pawn.userData.draggable = true;
-        pawn.userData.name = 'pawn';
-
-        // Zamiast "this.board.add" używamy globalnego "board"
-        board.add(pawn);
-
-        const pieceColor = row === 1 ? "Black" : "White";
-
-        return new Pawn(pieceColor, row, column, pawn,"pawn");
     }
 }
 
+export class Queen extends Piece {
+    constructor(type, color, row, column) {
+        super(type, color, row, column);
+    }
+
+    move_rules() {
+        return "Queen can move diagonally, horizontally, or vertically any number of squares.";
+    }
+}
+
+
+
+export class King extends Piece {
+    constructor(type, color, row, column) {
+        super(type, color, row, column);
+    }
+
+    move_rules() {
+        return "King can move one square in any direction.";
+    }
+}
+
+export class Knight extends Piece {
+    constructor(type, color, row, column) {
+        super(type, color, row, column);
+    }
+
+    move_rules() {
+        return "Knight moves like L shape";
+    }
+}
+
+
+
+export class Rook extends Piece {
+    constructor(type, color, row, column) {
+        super(type, color, row, column);
+    }
+
+    move_rules() {
+        return "Rook horizontally, or vertically any number of squares.";
+    }
+}
 
 export class Bishop extends Piece {
-
-    constructor(color, row, column, model3D) {
-        super(color, row, column, model3D);
+    constructor(type, color, row, column) {
+        super(type, color, row, column);
     }
 
     move_rules() {
-        return "Rook can move horizontally or vertically any number of squares.";
-    }
-}
-
-class Knight extends Piece {
-
-    constructor(color, row, column, model3D) {
-        super(color, row, column, model3D);
-    }
-
-    move_rules() {
-        return "Rook can move horizontally or vertically any number of squares.";
-    }
-}
-
-// Klasa podrzędna dla wieży (rook)
-class Rook extends Piece {
-
-    constructor(color, row, column, model3D) {
-        super(color, row, column, model3D);
-    }
-
-    move_rules() {
-        return "Rook can move horizontally or vertically any number of squares.";
+        return "Bishop can move diagonally any number of squares.";
     }
 }
 
 
-class Queen extends Piece {
-
-    constructor(color, row, column, model3D) {
-        super(color, row, column, model3D);
+export class Pawn extends Piece {
+    constructor(type, color, row, column) {
+        super(type, color, row, column);
     }
 
     move_rules() {
-        return "Rook can move horizontally or vertically any number of squares.";
-    }
-}
-
-class King extends Piece {
-
-    constructor(color, row, column, model3D) {
-        super(color, row, column, model3D);
-    }
-
-    move_rules() {
-        return "Rook can move horizontally or vertically any number of squares.";
+        return "Pawn can move only forward";
     }
 }
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-//
-//
-// export class Pieces {
-//     constructor(Model_obj, x_position, z_position, type) {
-//         this.loader = new OBJLoader();
-//         this.pawnModelPath = "pionek.obj";
-//         this.bishopModelPath = "skoczek.obj";
-//         this.textureLoader = new THREE.TextureLoader();
-//
-//     }
-//
-//     create_pawn(row, col, translation_x, translation_z)  {
-//         const pawnTextureBlack = this.textureLoader.load('Textures_pawn/Obsydian_texture.png'); // Ścieżka do tekstury czarnego pionka
-//         const pawnNormalMapBlack = this.textureLoader.load('Textures_pawn/Obsydian_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
-//         const pawnDisplacementMapBlack = this.textureLoader.load('Textures_pawn/Obsydian_texture_Displacment.png')*0.5; // Path to the displacement map texture
-//         const pawnMaterialBlack = new THREE.MeshStandardMaterial({
-//             map: pawnTextureBlack,
-//             normalMap: pawnNormalMapBlack,
-//             displacementMap: pawnDisplacementMapBlack,
-//             metalness: 0.5,
-//             roughness: 0.78
-//         });
-//         const pawnTextureWhite = this.textureLoader.load("Textures_pawn/Marble_texture.png"); // Ścieżka do tekstury czarnego pionka
-//         const pawnNormalMapWhite = this.textureLoader.load('Textures_pawn/Marble_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
-//         const pawnMaterialWhite = new THREE.MeshStandardMaterial({
-//             map: pawnTextureWhite,
-//             normalMap: pawnNormalMapWhite,
-//             metalness: 0.1,
-//             roughness: 0.6
-//         });
-//
-//         this.loader.load(this.pawnModelPath, function (pawn) {
-//             pawn.scale.set(0.5, 0.5, 0.5);
-//             pawn.position.set(translation_x, 0.5, translation_z);
-//             pawn.castShadow = true;
-//             pawn.receiveShadow = true;
-//             pawn.userData.draggable = true;
-//             pawn.userData.name = 'pawn';
-//             pawn.traverse(function (child) {
-//                 if (child.isMesh) {
-//                     child.material = row === 1 ? pawnMaterialBlack : pawnMaterialWhite;
-//                 }
-//                 // board.add(pawn);
-//             });
-//         });
-//         return pawn;
-//     }
-//
-//
-//     create_bishop(row, col, translation_x, translation_z) {
-//         const bishopTextureBlack = this.textureLoader.load('Textures_bishop/Obsydian_texture.png'); // Ścieżka do tekstury czarnego pionka
-//         const bishopNormalMapBlack = this.textureLoader.load('Textures_bishop/Obsydian_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
-//         const bishopDisplacementMapBlack = this.textureLoader.load('Textures_bishop/Obsydian_texture_Displacment.png')*0.5; // Path to the displacement map texture
-//         const bishopMaterialBlack = new THREE.MeshStandardMaterial({
-//             map: bishopTextureBlack,
-//             normalMap: bishopNormalMapBlack,
-//             displacementMap: bishopDisplacementMapBlack,
-//             metalness: 0.5,
-//             roughness: 0.78
-//         });
-//         const bishopTextureWhite = this.textureLoader.load("Textures_bishop/Marble_texture.png"); // Ścieżka do tekstury czarnego pionka
-//         const bishopNormalMapWhite = this.textureLoader.load('Textures_bishop/Marble_normal.png'); // Ścieżka do mapy normalnej czarnego pionka
-//         const bishopMaterialWhite = new THREE.MeshStandardMaterial({
-//             map: bishopTextureWhite,
-//             normalMap: bishopNormalMapWhite,
-//             metalness: 0.1,
-//             roughness: 0.6
-//         });
-//
-//         return new Promise((resolve) => {
-//             this.loader.load(this.bishopModelPath, function (bishop) {
-//                 bishop.scale.set(0.5, 0.5, 0.5);
-//                 bishop.position.set(translation_x, 0.5, translation_z);
-//                 bishop.castShadow = true;
-//                 bishop.receiveShadow = true;
-//                 bishop.traverse(function (child) {
-//                     if (child.isMesh) {
-//                         child.material = bishopMaterialBlack;
-//                     }
-//                     // board.add(bishop);
-//                 });
-//                 resolve(bishop);
-//             });
-//
-//
-//         });
-//
-//     }
-// }
