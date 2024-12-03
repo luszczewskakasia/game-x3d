@@ -1,6 +1,17 @@
 import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.135.0/examples/jsm/loaders/OBJLoader.js';
 import * as THREE from 'three';
 import * as tex from './textures.js';
+import {
+    createKingMaterialGold,
+    createKnightMaterialMarble,
+    createKnightMaterialMarbleO,
+    createKnightMaterialObsidian,
+    createKnightMaterialObsidianM,
+    createQueenMaterialGold,
+    createQueenMaterialMarble,
+    createQueenMaterialObsidian,
+    createQueenMaterialSatin
+} from "./textures.js";
 // import * as main from './main';
 
 // const board = main.board
@@ -46,33 +57,33 @@ export class Piece {
             case "queen":
                 Model3D = queenModelPath;
                 tex_layers = 3;
-                textures = [tex.queen_gold,color === "white" ? tex.queen_obsidian : tex.queen_marble,tex.queen_satin];
+                textures = [tex.createQueenMaterialGold(),color === "white" ? tex.createQueenMaterialObsidian() : tex.createQueenMaterialMarble(),tex.createQueenMaterialSatin()];
                 break;
 
             case "king":
                 Model3D = kingModelPath;
                 tex_layers = 3;
-                textures = [color === "white" ? tex.king_obsidian : tex.king_marble,tex.king_satin,tex.king_gold];
+                textures = [color === "white" ? tex.createKingMaterialObsidian() : tex.createKingMaterialMarble(),tex.createKingMaterialSatin(),tex.createKingMaterialGold()];
                 break;
             case "bishop":
                 Model3D = bishopModelPath;
                 tex_layers = 1;
-                textures = [color === "white" ? tex.bishopMaterialBlack : tex.bishopMaterialWhite];
+                textures = [color === "white" ? tex.createBishopMaterialBlack() : tex.createBishopMaterialWhite()];
                 break;
             case "knight":
                 Model3D = knightModelPath;
                 tex_layers = 3;
-                textures = [color === "white" ? tex.knight_obsidian : tex.knight_marble,tex.knight_gold,color === "white" ? tex.knight_obsidian_m : tex.knight_marble_o];
+                textures = [color === "white" ? tex.createKnightMaterialObsidian() : tex.createKnightMaterialMarble(),tex.createKingMaterialGold(),color === "white" ? tex.createKnightMaterialObsidianM() : tex.createKnightMaterialMarbleO()];
                 break;
             case "pawn":
                 Model3D = pawnModelPath;
                 tex_layers = 1;
-                textures = [color === "white" ? tex.pawnMaterialBlack : tex.pawnMaterialWhite];
+                textures = [color === "white" ? tex.createPawnMaterialBlack() : tex.createPawnMaterialWhite()];
                 break;
             case "rook":
                 Model3D = rookModelPath;
                 tex_layers = 1;
-                textures = [color === "white" ? tex.rookMaterialBlack : tex.rookMaterialWhite];
+                textures = [color === "white" ? tex.createRookMaterialBlack() : tex.createRookMaterialWhite()];
                 break;
 
             default:

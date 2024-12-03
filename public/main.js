@@ -84,33 +84,14 @@ class ChessScene {
 
     create_chessboard()
     {
-        // const loader = new OBJLoader();
-        // const pawnModelPath = "pionek.obj";
-        // const bishopModelPath = "skoczek.obj";
-        // const rookModelPath = "wieza.obj";
-        // const kingModelPath = "krol.obj";
-        // const queenModelPath = "krolowka.obj";
-        // const knightModelPath = "konik.obj";
-
-
-        // const rows = 8;
-        // const cols = 8;
-        // const square_size = 1.0
-        // const square_geo = new THREE.BoxGeometry(1, 0.1, 1);
-        // const green = new THREE.Color(0x00ff00);
-        // const yellow = new THREE.Color(0xffff00);
-
         const background_geo = new THREE.BoxGeometry(9, 1, 9);
         const background_material = new THREE.MeshBasicMaterial({ color: 0x964B00 });
         const background_cube = new THREE.Mesh(background_geo, background_material);
         this.scene.add(background_cube);
-
         const square_size = 1;
         const rows = 8;
         const cols = 8;
         const square_geo = new THREE.BoxGeometry(square_size, 0.1, square_size);
-        const white = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        const black = new THREE.MeshBasicMaterial({ color: 0x000000 });
         const green = new THREE.MeshBasicMaterial({ color: 0x0b4f1d });
         const yellow = new THREE.MeshBasicMaterial({ color: 0xc2c28c });
         const board = new THREE.Group();
@@ -194,7 +175,17 @@ class ChessScene {
 
         if (intersects.length > 0) {
             const intersectedObject = intersects[0].object;
-            intersectedObject.material.emissive.set(0xff0000);
+
+            if (Array.isArray(intersectedObject.material))
+            {
+                intersectedObject.material[0].emissive.set(0xff0000);
+                intersectedObject.material[1].emissive.set(0xff0000);
+                intersectedObject.material[2].emissive.set(0xff0000);
+            }
+            else
+            {
+                intersectedObject.material.emissive.set(0xff0000);
+            }
             if (intersectedObject.userData && intersectedObject.userData.draggable) {
                 this.draggable = intersectedObject;
                 console.log(`Found draggable: ${this.draggable.userData.name}`);
