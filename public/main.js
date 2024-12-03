@@ -19,7 +19,7 @@ class ChessScene {
         this.move_mouse = new THREE.Vector2();
         this.draggable = null;
         this.is_draggable = false;
-        this.board = this.create_chessboard();
+        // this.board = this.create_chessboard();
         this.loaded_scene = false;
 
 
