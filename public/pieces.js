@@ -105,6 +105,7 @@ export class Piece {
             });
             piece.userData.draggable = true;
             piece.userData.name = type.toLowerCase();
+            console.log('piece created')
 
             board.add(piece);
             switch(type.toLowerCase())
@@ -125,6 +126,7 @@ export class Piece {
                     throw new Error(`Unsupported piece type: ${type}`);
 
             }
+            // loaded_scene = true; 
         });
 
     }

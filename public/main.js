@@ -3,6 +3,7 @@ import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.135.0/examples/j
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as tex from './textures.js';
 import * as pieces from './pieces.js';
+import { Animation } from './animation.js';
 
 let board;
 
@@ -18,6 +19,8 @@ class ChessScene {
         this.move_mouse = new THREE.Vector2();
         this.draggable = null;
         this.is_draggable = false;
+        this.board = this.create_chessboard();
+        this.loaded_scene = false;
 
 
         this.init_scene();
@@ -145,12 +148,19 @@ class ChessScene {
                 this.scene.add(board);
             }
         }
+        this.loaded_scene = true;
         return board;
     }
 
 
     animate() {
         this.drag_object(); 
+        if (this.loaded_scene) {
+            setTimeout(() => {
+                Animation.bounce(this.scene, 3, 1, 0.5, 0);
+            }, 5000);
+            
+        }
         this.renderer.render(this.scene, this.camera);
     }
 
