@@ -150,3 +150,18 @@ export const createKnightMaterialMarbleO = () => new THREE.MeshStandardMaterial(
     metalness: Black_metalness,
     roughness: Black_roughness
 });
+
+export const green = () => new THREE.MeshStandardMaterial({
+    color: 0x0b4f1d,         // Kolor podstawowy (np. zielony)
+    emissive: 0x000000,      // Kolor emisji (np. czarny)
+    emissiveIntensity: 1,    // Intensywność emisji
+    metalness: 0.5,          // Metaliczność (opcjonalnie)
+    roughness: 0.5           // Chropowatość (opcjonalnie)
+});
+export const yellow = () => new THREE.MeshStandardMaterial({
+    color: 0xc2c28c,         // Kolor podstawowy (np. zielony)
+    emissive: 0x000000,      // Kolor emisji (np. czarny)
+    emissiveIntensity: 1,    // Intensywność emisji
+    metalness: 0.5,          // Metaliczność (opcjonalnie)
+    roughness: 0.5           // Chropowatość (opcjonalnie)
+});

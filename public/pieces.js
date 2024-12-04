@@ -31,18 +31,22 @@ export class Piece {
         if (new.target === Piece) {
             throw new Error("Cannot instantiate an abstract class.");
         }
-        this.type = this.constructor.name.toLowerCase();
+        this.type = type.toLowerCase();
         this.row = row;
         this.column = column;
         this.color = color;
-        const square_size = 1;
-        const translation_x = (column - 7/ 2) * square_size;
-        const translation_z = (row - 7/ 2) * square_size;
+        this.active = false;
+        this.draggable = true;
+        this.name = `${this.type}_${row}_${column}`;
+        // const square_size = 1;
+        // const translation_x = (column - 7/ 2) * square_size;
+        // const translation_z = (row - 7/ 2) * square_size;
+
         // this.model3D = this.createPiece(type,color,row,column,translation_x,translation_z);
 
     }
 
-    move_rules() {
+    move_rules(board) {
         throw new Error("Abstract method 'move_rules' must be implemented in derived class.");
     }
 
@@ -93,11 +97,14 @@ export class Piece {
 
 
         return loader.loadAsync(Model3D).then((group) => {
-            const piece = group.children[0];
+
+            const piece = group.children[0]
+
             piece.scale.set(0.5, 0.5, 0.5);
             piece.position.set(translation_x, 0.5, translation_z);
             piece.castShadow = true;
             piece.receiveShadow = true;
+            piece.type = "Piece"
             piece.traverse(function (child) {
                 if (child.isMesh) {
                     if(tex_layers === 1)
@@ -114,25 +121,33 @@ export class Piece {
 
                 }
             });
-            piece.userData.draggable = true;
-            piece.userData.name = type.toLowerCase();
-            console.log('piece created')
 
-            board.add(piece);
             switch(type.toLowerCase())
             {
                 case "queen":
-                    return new Queen(color, row, column, piece);
+                    piece.userData = new Queen("queen",color, row, column);
+                    board.add(piece);
+                    return piece.userData
                 case "king":
-                    return new King(color, row, column, piece);
+                    piece.userData =new King("king",color, row, column);
+                    board.add(piece);
+                    return piece.userData
                 case "bishop":
-                    return new Bishop(color, row, column, piece);
+                    piece.userData =new Bishop("bishop",color, row, column);
+                    board.add(piece);
+                    return piece.userData
                 case "knight":
-                    return new Knight(color, row, column, piece);
+                    piece.userData = new Knight("knight",color, row, column);
+                    board.add(piece);
+                    return piece.userData
                 case "pawn":
-                    return new Pawn(color, row, column, piece);
+                    piece.userData = new Pawn("pawn",color, row, column);
+                    board.add(piece);
+                    return piece.userData
                 case "rook":
-                    return new Rook(color, row, column, piece);
+                    piece.userData = new Rook("rook",color, row, column);
+                    board.add(piece);
+                    return piece.userData
                 default:
                     throw new Error(`Unsupported piece type: ${type}`);
 
@@ -148,7 +163,7 @@ export class Queen extends Piece {
         super(type, color, row, column);
     }
 
-    move_rules() {
+    move_rules(board) {
         return "Queen can move diagonally, horizontally, or vertically any number of squares.";
     }
 }
@@ -160,7 +175,7 @@ export class King extends Piece {
         super(type, color, row, column);
     }
 
-    move_rules() {
+    move_rules(board) {
         return "King can move one square in any direction.";
     }
 }
@@ -170,7 +185,7 @@ export class Knight extends Piece {
         super(type, color, row, column);
     }
 
-    move_rules() {
+    move_rules(board) {
         return "Knight moves like L shape";
     }
 }
@@ -182,7 +197,19 @@ export class Rook extends Piece {
         super(type, color, row, column);
     }
 
-    move_rules() {
+    move_rules(board) {
+        for (let i = 0; i < board.children.length; i++) {
+
+            if (board.children[i].type === "Field") {
+                const field = board.children[i];
+
+                if (field.userData.row === this.row || field.userData.column === this.column)
+                {
+                    board.children[i].material.emissive.set(0xff0000);
+                }
+            }
+        }
+
         return "Rook horizontally, or vertically any number of squares.";
     }
 }
@@ -192,7 +219,7 @@ export class Bishop extends Piece {
         super(type, color, row, column);
     }
 
-    move_rules() {
+    move_rules(board) {
         return "Bishop can move diagonally any number of squares.";
     }
 }
@@ -203,10 +230,20 @@ export class Pawn extends Piece {
         super(type, color, row, column);
     }
 
-    move_rules() {
+    move_rules(board) {
         return "Pawn can move only forward";
     }
 }
 
 
 
+export class Field{
+    constructor(row, column) {
+            this.type = "ground";
+            this.row = row;
+            this.column = column;
+            this.legal = false;
+        }
+
+
+}

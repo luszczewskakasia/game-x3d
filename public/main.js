@@ -17,9 +17,9 @@ class ChessScene {
         this.raycaster = new THREE.Raycaster();
         this.click_mouse = new THREE.Vector2();
         this.move_mouse = new THREE.Vector2();
-        this.draggable = null;
+        this.draggable_obj = null;
         this.is_draggable = false;
-        // this.board = this.create_chessboard();
+        this.board = null;
         this.loaded_scene = false;
 
 
@@ -27,24 +27,22 @@ class ChessScene {
 
         this.init_event_listeners();  
     }
+
     init_scene() {
         this.create_lightning();
-        this.board = this.create_chessboard();
+        this.create_chessboard();
         this.renderer.setAnimationLoop(() => this.animate());
     }
 
+    create_camera() {
+        const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 1000 );
+        camera.position.y = 5;
+        camera.position.x = 7;
+        camera.lookAt(0, 0, 0);
+        return camera;
+    }
 
-        create_camera()
-        {
-            const camera = new THREE.PerspectiveCamera( 80, window.innerWidth / window.innerHeight, 0.1, 1000 );
-            camera.position.y = 5;
-            camera.position.x = 7;
-            camera.lookAt(0, 0, 0);
-            return camera;
-        }
-
-    create_controls()
-    {
+    create_controls() {
         var controls;
 
         controls = new OrbitControls(this.camera, this.renderer.domElement)
@@ -82,57 +80,62 @@ class ChessScene {
         this.scene.add(light, pointLight);
     }
 
-    create_chessboard()
-    {
+    create_chessboard() {
         const background_geo = new THREE.BoxGeometry(9, 1, 9);
         const background_material = new THREE.MeshBasicMaterial({ color: 0x964B00 });
         const background_cube = new THREE.Mesh(background_geo, background_material);
         this.scene.add(background_cube);
+        // pieces.PiecesGeneration(this.board)
+
+
+
         const square_size = 1;
         const rows = 8;
         const cols = 8;
         const square_geo = new THREE.BoxGeometry(square_size, 0.1, square_size);
-        const green = new THREE.MeshBasicMaterial({ color: 0x0b4f1d });
-        const yellow = new THREE.MeshBasicMaterial({ color: 0xc2c28c });
-        const board = new THREE.Group();
+        this.board = new THREE.Group();
+
 
         for (let row = 0; row < rows; row++) {
             for (let col = 0; col < cols; col++) {
-                const color = (row + col) % 2 === 0 ? green : yellow;
+
+                const color = (row + col) % 2 === 0 ? tex.green() : tex.yellow();
                 const square_mesh = new THREE.Mesh(square_geo, color);
                 const translation_x = (col - (cols - 1)/ 2) * square_size;
                 const translation_z = (row - (rows - 1)/ 2) * square_size;
                 square_mesh.position.set(translation_x, 0.5, translation_z);
-                square_mesh.userData.ground = true;
-                board.add(square_mesh);
+                square_mesh.userData = new pieces.Field(row,col)
+                square_mesh.type = "Field";
+                square_mesh.material.emissive = new THREE.Color(0x000000);
+                this.board.add(square_mesh);
 
 
                 if (row === 1 || row === 6) {
-                    pieces.Piece.createPiece("pawn",row === 1 ? "white" :"black",row,col,translation_x,translation_z,board)
+                    pieces.Piece.createPiece("pawn", row === 1 ? "white" : "black", row, col, translation_x, translation_z, this.board)
                 }
                 if ((row === 0 || row === 7 )&& (col === 2 || col === 5)) {
-                    pieces.Piece.createPiece("bishop",row === 0 ? "white" :"black",row,col,translation_x,translation_z,board)
+                    pieces.Piece.createPiece("bishop",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
                 }
 
                 if ((row === 0 || row === 7 )&& (col === 7 || col === 0)) {
-                    pieces.Piece.createPiece("rook",row === 0 ? "white" :"black",row,col,translation_x,translation_z,board)
+                    pieces.Piece.createPiece("rook",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
+
                 }
                 if (col === 4 && (row === 7 || row === 0)){
-                    pieces.Piece.createPiece("queen",row === 0 ? "white" :"black",row,col,translation_x,translation_z,board)
+                    pieces.Piece.createPiece("queen",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
                 }
                 if (col === 3 && (row === 7 || row === 0)){
-                    pieces.Piece.createPiece("king",row === 0 ? "white" :"black",row,col,translation_x,translation_z,board)
+                    pieces.Piece.createPiece("king",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
                 }
                 if ((row === 0 || row === 7) && (col === 6 || col === 1)){
-                    pieces.Piece.createPiece("knight",row === 0 ? "white" :"black",row,col,translation_x,translation_z,board)
+                    pieces.Piece.createPiece("knight",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
                 }
-                this.scene.add(board);
+                this.scene.add(this.board);
             }
         }
         this.loaded_scene = true;
-        return board;
+        // console.log(this.board);
     }
-
 
     animate() {
         this.drag_object(); 
@@ -145,25 +148,30 @@ class ChessScene {
         this.renderer.render(this.scene, this.camera);
     }
 
-
     init_event_listeners() {
         window.addEventListener('click', event => this.handle_mouse_click(event));
         window.addEventListener('mousemove', event => this.handle_mouse_move(event));
     }
-    
+
     handle_mouse_click(event) {
-        if (this.draggable) {
 
-            console.log(`Drop draggable: ${this.draggable.userData.name}`);
+        if (this.draggable_obj) {
 
-            const target_pos_x = Math.floor(this.draggable.position.x) + 0.5;
-            const target_pos_z = Math.floor(this.draggable.position.z) + 0.5;
+            // console.log(`Drop draggable: ${this.draggable.userData.name}`);
+            // console.log(this.board);
 
-            this.draggable.position.set(target_pos_x, 0.5, target_pos_z);
-
-            this.draggable = null; 
+            const target_pos_x = Math.floor(this.draggable_obj.position.x) + 0.5;
+            const target_pos_z = Math.floor(this.draggable_obj.position.z) + 0.5;
+            this.draggable_obj.position.set(target_pos_x, 0.5, target_pos_z);
+            this.draggable_obj.userData.row = this.position_to_row(target_pos_z)
+            this.draggable_obj.userData.column = this.position_to_row(target_pos_x)
             this.is_draggable = false;
             console.log(`Dropped at: ${target_pos_x}, ${target_pos_z}`);
+            // console.log();
+            this.draggable_obj.userData.active = false;
+            this.clear_board();
+            this.change_emission(this.draggable_obj);
+            this.draggable_obj = null;
             return;
         }
 
@@ -176,20 +184,18 @@ class ChessScene {
         if (intersects.length > 0) {
             const intersectedObject = intersects[0].object;
 
-            if (Array.isArray(intersectedObject.material))
-            {
-                intersectedObject.material[0].emissive.set(0xff0000);
-                intersectedObject.material[1].emissive.set(0xff0000);
-                intersectedObject.material[2].emissive.set(0xff0000);
-            }
-            else
-            {
-                intersectedObject.material.emissive.set(0xff0000);
-            }
+
+            // intersectedObject.userData.draggable = !intersectedObject.userData.draggable;
+
+
             if (intersectedObject.userData && intersectedObject.userData.draggable) {
-                this.draggable = intersectedObject;
-                console.log(`Found draggable: ${this.draggable.userData.name}`);
+                this.draggable_obj = intersectedObject;
+                //console.log(intersectedObject);
+                intersectedObject.userData.move_rules(this.board)
                 this.is_draggable = true;
+                console.log(intersectedObject.userData.active)
+                intersectedObject.userData.active = true;
+                this.change_emission(intersectedObject);
             }
         } else {
             console.log('Nothing found');
@@ -203,21 +209,53 @@ class ChessScene {
     }
 
     drag_object() {
-        if (this.is_draggable && this.draggable) {
+        if (this.is_draggable && this.draggable_obj) {
             this.raycaster.setFromCamera(this.move_mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.board.children);
             
             if (intersects.length > 0) {
                 for (let obj of intersects) {
-                    if (!obj.object.userData.ground) continue;
 
-                    this.draggable.position.x = obj.point.x
-                    this.draggable.position.z = obj.point.z
+                    if (obj.object.userData.type != 'ground') continue;
+
+                    this.draggable_obj.position.x = obj.point.x
+                    this.draggable_obj.position.z = obj.point.z
 
                 }
             }
         }
     }
+
+    change_emission(object) {
+        const emission_color = object.userData.active ? 0xff0000 : 0x00000
+
+        if (Array.isArray(object.material)) {
+            object.material[0].emissive.set(emission_color);
+            object.material[1].emissive.set(emission_color);
+            object.material[2].emissive.set(emission_color);
+        } else {
+            object.material.emissive.set(emission_color);
+        }
+    }
+
+    clear_board()
+    {
+        for (let i = 0; i < this.board.children.length; i++) {
+            if (this.board.children[i].type === "Field") {
+                this.board.children[i].material.emissive.set(0x000000);
+            }
+        }
+    }
+
+    position_to_row(value) {
+        const min_old = -3.5;
+        const max_old = 3.5;
+        const min_new = 0;
+        const max_new = 7;
+        const new_value = ((value - min_old) / (max_old - min_old)) * (max_new - min_new) + min_new;
+        return Math.round(new_value);
+    }
+
 
 }
 
