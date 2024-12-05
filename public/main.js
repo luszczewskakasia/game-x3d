@@ -21,6 +21,11 @@ class ChessScene {
         this.is_draggable = false;
         this.board = null;
         this.loaded_scene = false;
+        this.params = {
+            damping: 0.9,
+            frequency: 0.2,
+            response_factor: 0.2
+        };
 
 
         this.init_scene();
@@ -119,7 +124,6 @@ class ChessScene {
 
                 if ((row === 0 || row === 7 )&& (col === 7 || col === 0)) {
                     pieces.Piece.createPiece("rook",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
-
                 }
                 if (col === 4 && (row === 7 || row === 0)){
                     pieces.Piece.createPiece("queen",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
@@ -137,12 +141,17 @@ class ChessScene {
         // console.log(this.board);
     }
 
+
     animate() {
         this.drag_object(); 
         if (this.loaded_scene) {
-            setTimeout(() => {
-                Animation.bounce(this.scene, 3, 1, 0.5, 0);
-            }, 5000);
+            // setTimeout(() => {
+            //     Animation.bounce(this.scene, 3, 1, 0.5, 0);
+            // }, 5000);
+
+            // setTimeout(() => {
+            //     Animation.second_order_model(this.scene, 0, params, 0.5);
+            // }, 5000);
             
         }
         this.renderer.render(this.scene, this.camera);
@@ -155,20 +164,28 @@ class ChessScene {
 
     handle_mouse_click(event) {
 
-        if (this.draggable_obj) {
+        if (this.draggable_obj && this.is_draggable) {
 
             // console.log(`Drop draggable: ${this.draggable.userData.name}`);
             // console.log(this.board);
 
-            const target_pos_x = Math.floor(this.draggable_obj.position.x) + 0.5;
-            const target_pos_z = Math.floor(this.draggable_obj.position.z) + 0.5;
-            this.draggable_obj.position.set(target_pos_x, 0.5, target_pos_z);
+            const target_pos_x = Math.floor(this.draggable_obj.userData.setPosition.x) + 0.5;
+            const target_pos_z = Math.floor(this.draggable_obj.userData.setPosition.z) + 0.5;
+
+            let new_setPoint = new THREE.Vector3(target_pos_x, 0.5, target_pos_z)
+
+            this.draggable_obj.userData.active = false;
+            this.draggable_obj.userData.setPositionPrime =  new_setPoint.clone().sub(this.draggable_obj.userData.setPosition.clone())
+            this.draggable_obj.userData.setPosition = new_setPoint.clone()
+
+            // Animation.second_order_model(this.draggable_obj , this.params, 0.05);
+
+
             this.draggable_obj.userData.row = this.position_to_row(target_pos_z)
             this.draggable_obj.userData.column = this.position_to_row(target_pos_x)
             this.is_draggable = false;
             console.log(`Dropped at: ${target_pos_x}, ${target_pos_z}`);
-            // console.log();
-            this.draggable_obj.userData.active = false;
+            console.log(this.draggable_obj.userData.active);
             this.clear_board();
             this.change_emission(this.draggable_obj);
             this.draggable_obj = null;
@@ -188,13 +205,15 @@ class ChessScene {
             // intersectedObject.userData.draggable = !intersectedObject.userData.draggable;
 
 
-            if (intersectedObject.userData && intersectedObject.userData.draggable) {
+            if (!intersectedObject.userData.active && intersectedObject.userData.draggable) {
+
+                console.log(intersectedObject)
+
                 this.draggable_obj = intersectedObject;
-                //console.log(intersectedObject);
                 intersectedObject.userData.move_rules(this.board)
                 this.is_draggable = true;
-                console.log(intersectedObject.userData.active)
                 intersectedObject.userData.active = true;
+                console.log(intersectedObject.userData.active)
                 this.change_emission(intersectedObject);
             }
         } else {
@@ -218,8 +237,19 @@ class ChessScene {
 
                     if (obj.object.userData.type != 'ground') continue;
 
-                    this.draggable_obj.position.x = obj.point.x
-                    this.draggable_obj.position.z = obj.point.z
+
+                    if (this.draggable_obj.userData.active)
+                    {
+                        this.draggable_obj.userData.setPositionPrime = obj.point.clone().sub( this.draggable_obj.userData.setPosition.clone());
+                        this.draggable_obj.userData.setPosition = obj.point.clone()
+                    }
+                    // var setPointPrime =obj.point.clone().sub( this.draggable_obj.position.clone());
+
+                    Animation.second_order_model(this.draggable_obj , this.params, 0.05);
+
+
+                    // this.draggable_obj.position.x = obj.point.x
+                    // this.draggable_obj.position.z = obj.point.z
 
                 }
             }

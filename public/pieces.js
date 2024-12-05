@@ -38,10 +38,11 @@ export class Piece {
         this.active = false;
         this.draggable = true;
         this.name = `${this.type}_${row}_${column}`;
-        // const square_size = 1;
-        // const translation_x = (column - 7/ 2) * square_size;
-        // const translation_z = (row - 7/ 2) * square_size;
-
+        const square_size = 1;
+        const translation_x = (column - 7/ 2) * square_size;
+        const translation_z = (row - 7/ 2) * square_size;
+        this.setPosition = new THREE.Vector3(translation_x,0.5,translation_z);
+        this.setPositionPrime = new THREE.Vector3(0,0.0,0);
         // this.model3D = this.createPiece(type,color,row,column,translation_x,translation_z);
 
     }
