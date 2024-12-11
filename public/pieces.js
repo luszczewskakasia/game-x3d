@@ -165,6 +165,20 @@ export class Queen extends Piece {
     }
 
     move_rules(board) {
+        for (let i = 0; i < board.children.length; i++) {
+            if (board.children[i].type === "Field") {
+                const field = board.children[i];
+
+                if (
+                    field.userData.row === this.row ||
+                    field.userData.column === this.column ||
+                    Math.abs(field.userData.row - this.row) === Math.abs(field.userData.column - this.column)
+                ) {
+                    field.material.emissive.set(0xff0000);
+                }
+            }
+        }
+
         return "Queen can move diagonally, horizontally, or vertically any number of squares.";
     }
 }
@@ -177,6 +191,19 @@ export class King extends Piece {
     }
 
     move_rules(board) {
+        for (let i = 0; i < board.children.length; i++) {
+            if (board.children[i].type === "Field") {
+                const field = board.children[i];
+
+                if (
+                    Math.abs(field.userData.row - this.row) <= 1 &&
+                    Math.abs(field.userData.column - this.column) <= 1
+                ) {
+                    field.material.emissive.set(0xff0000);
+                }
+            }
+        }
+
         return "King can move one square in any direction.";
     }
 }
@@ -187,7 +214,33 @@ export class Knight extends Piece {
     }
 
     move_rules(board) {
-        return "Knight moves like L shape";
+        const knightMoves = [
+            { row: -2, col: -1 },
+            { row: -2, col: 1 },
+            { row: -1, col: -2 },
+            { row: -1, col: 2 },
+            { row: 1, col: -2 },
+            { row: 1, col: 2 },
+            { row: 2, col: -1 },
+            { row: 2, col: 1 }
+        ];
+
+        for (let i = 0; i < board.children.length; i++) {
+            if (board.children[i].type === "Field") {
+                const field = board.children[i];
+
+                knightMoves.forEach((move) => {
+                    if (
+                        field.userData.row === this.row + move.row &&
+                        field.userData.column === this.column + move.col
+                    ) {
+                        field.material.emissive.set(0xff0000);
+                    }
+                });
+            }
+        }
+
+        return "Knight moves in an L shape.";
     }
 }
 
@@ -221,6 +274,16 @@ export class Bishop extends Piece {
     }
 
     move_rules(board) {
+        for (let i = 0; i < board.children.length; i++) {
+            if (board.children[i].type === "Field") {
+                const field = board.children[i];
+
+                if (Math.abs(field.userData.row - this.row) === Math.abs(field.userData.column - this.column)) {
+                    field.material.emissive.set(0xff0000);
+                }
+            }
+        }
+
         return "Bishop can move diagonally any number of squares.";
     }
 }
@@ -232,7 +295,28 @@ export class Pawn extends Piece {
     }
 
     move_rules(board) {
-        return "Pawn can move only forward";
+        const direction = this.color === "white" ? 1 : -1;
+
+        for (let i = 0; i < board.children.length; i++) {
+            if (board.children[i].type === "Field") {
+                const field = board.children[i];
+
+                if (field.userData.row === this.row + direction && field.userData.column === this.column) {
+                    field.material.emissive.set(0xff0000);
+                }
+
+                if (
+                    (this.color === "white" && this.row === 1) ||
+                    (this.color === "black" && this.row === 6)
+                ) {
+                    if (field.userData.row === this.row + 2 * direction && field.userData.column === this.column) {
+                        field.material.emissive.set(0xff0000);
+                    }
+                }
+            }
+        }
+
+        return "Pawn can move forward one square, optionally two if in its starting position, and capture diagonally.";
     }
 }
 
