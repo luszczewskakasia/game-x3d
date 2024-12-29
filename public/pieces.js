@@ -27,7 +27,7 @@ const knightModelPath = "konik.obj";
 
 
 export class Piece {
-    constructor(type, color, row, column) {
+    constructor(type, color, row, column, mesh) {
         if (new.target === Piece) {
             throw new Error("Cannot instantiate an abstract class.");
         }
@@ -43,6 +43,7 @@ export class Piece {
         const translation_z = (row - 7/ 2) * square_size;
         this.setPosition = new THREE.Vector3(translation_x,0.5,translation_z);
         this.setPositionPrime = new THREE.Vector3(0,0.0,0);
+        this.mesh = mesh
         // this.model3D = this.createPiece(type,color,row,column,translation_x,translation_z);
 
     }
@@ -62,33 +63,33 @@ export class Piece {
             case "queen":
                 Model3D = queenModelPath;
                 tex_layers = 3;
-                textures = [tex.createQueenMaterialGold(),color === "white" ? tex.createQueenMaterialObsidian() : tex.createQueenMaterialMarble(),tex.createQueenMaterialSatin()];
+                textures = [tex.createQueenMaterialGold(),color === "black" ? tex.createQueenMaterialObsidian() : tex.createQueenMaterialMarble(),tex.createQueenMaterialSatin()];
                 break;
 
             case "king":
                 Model3D = kingModelPath;
                 tex_layers = 3;
-                textures = [color === "white" ? tex.createKingMaterialObsidian() : tex.createKingMaterialMarble(),tex.createKingMaterialSatin(),tex.createKingMaterialGold()];
+                textures = [color === "black" ? tex.createKingMaterialObsidian() : tex.createKingMaterialMarble(),tex.createKingMaterialSatin(),tex.createKingMaterialGold()];
                 break;
             case "bishop":
                 Model3D = bishopModelPath;
                 tex_layers = 1;
-                textures = [color === "white" ? tex.createBishopMaterialBlack() : tex.createBishopMaterialWhite()];
+                textures = [color === "black" ? tex.createBishopMaterialBlack() : tex.createBishopMaterialWhite()];
                 break;
             case "knight":
                 Model3D = knightModelPath;
                 tex_layers = 3;
-                textures = [color === "white" ? tex.createKnightMaterialObsidian() : tex.createKnightMaterialMarble(),tex.createKingMaterialGold(),color === "white" ? tex.createKnightMaterialObsidianM() : tex.createKnightMaterialMarbleO()];
+                textures = [color === "black" ? tex.createKnightMaterialObsidian() : tex.createKnightMaterialMarble(),tex.createKingMaterialGold(),color === "white" ? tex.createKnightMaterialObsidianM() : tex.createKnightMaterialMarbleO()];
                 break;
             case "pawn":
                 Model3D = pawnModelPath;
                 tex_layers = 1;
-                textures = [color === "white" ? tex.createPawnMaterialBlack() : tex.createPawnMaterialWhite()];
+                textures = [color === "black" ? tex.createPawnMaterialBlack() : tex.createPawnMaterialWhite()];
                 break;
             case "rook":
                 Model3D = rookModelPath;
                 tex_layers = 1;
-                textures = [color === "white" ? tex.createRookMaterialBlack() : tex.createRookMaterialWhite()];
+                textures = [color === "black" ? tex.createRookMaterialBlack() : tex.createRookMaterialWhite()];
                 break;
 
             default:
@@ -126,27 +127,27 @@ export class Piece {
             switch(type.toLowerCase())
             {
                 case "queen":
-                    piece.userData = new Queen("queen",color, row, column);
+                    piece.userData = new Queen("queen",color, row, column,piece);
                     board.add(piece);
                     return piece.userData
                 case "king":
-                    piece.userData =new King("king",color, row, column);
+                    piece.userData =new King("king",color, row, column,piece);
                     board.add(piece);
                     return piece.userData
                 case "bishop":
-                    piece.userData =new Bishop("bishop",color, row, column);
+                    piece.userData =new Bishop("bishop",color, row, column,piece);
                     board.add(piece);
                     return piece.userData
                 case "knight":
-                    piece.userData = new Knight("knight",color, row, column);
+                    piece.userData = new Knight("knight",color, row, column,piece);
                     board.add(piece);
                     return piece.userData
                 case "pawn":
-                    piece.userData = new Pawn("pawn",color, row, column);
+                    piece.userData = new Pawn("pawn",color, row, column,piece);
                     board.add(piece);
                     return piece.userData
                 case "rook":
-                    piece.userData = new Rook("rook",color, row, column);
+                    piece.userData = new Rook("rook",color, row, column,piece);
                     board.add(piece);
                     return piece.userData
                 default:
@@ -160,8 +161,8 @@ export class Piece {
 }
 
 export class Queen extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh) {
+        super(type, color, row, column, mesh);
     }
 
     move_rules(board) {
@@ -170,11 +171,13 @@ export class Queen extends Piece {
                 const field = board.children[i];
 
                 if (
-                    field.userData.row === this.row ||
+                    (field.userData.row === this.row ||
                     field.userData.column === this.column ||
-                    Math.abs(field.userData.row - this.row) === Math.abs(field.userData.column - this.column)
+                    Math.abs(field.userData.row - this.row) === Math.abs(field.userData.column - this.column))
+                    && !field.piece_on
                 ) {
                     field.material.emissive.set(0xff0000);
+                    field.userData.legal = true;
                 }
             }
         }
@@ -186,8 +189,8 @@ export class Queen extends Piece {
 
 
 export class King extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh) {
+        super(type, color, row, column, mesh);
     }
 
     move_rules(board) {
@@ -197,9 +200,11 @@ export class King extends Piece {
 
                 if (
                     Math.abs(field.userData.row - this.row) <= 1 &&
-                    Math.abs(field.userData.column - this.column) <= 1
+                    Math.abs(field.userData.column - this.column) <= 1 &&
+                    !field.piece_on
                 ) {
                     field.material.emissive.set(0xff0000);
+                    field.userData.legal = true;
                 }
             }
         }
@@ -209,8 +214,8 @@ export class King extends Piece {
 }
 
 export class Knight extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh) {
+        super(type, color, row, column, mesh);
     }
 
     move_rules(board) {
@@ -233,8 +238,10 @@ export class Knight extends Piece {
                     if (
                         field.userData.row === this.row + move.row &&
                         field.userData.column === this.column + move.col
+                        && !field.piece_on
                     ) {
                         field.material.emissive.set(0xff0000);
+                        field.userData.legal = true;
                     }
                 });
             }
@@ -247,8 +254,8 @@ export class Knight extends Piece {
 
 
 export class Rook extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh) {
+        super(type, color, row, column, mesh);
     }
 
     move_rules(board) {
@@ -257,9 +264,11 @@ export class Rook extends Piece {
             if (board.children[i].type === "Field") {
                 const field = board.children[i];
 
-                if (field.userData.row === this.row || field.userData.column === this.column)
+                if ((field.userData.row === this.row || field.userData.column === this.column)
+                    && !field.piece_on)
                 {
-                    board.children[i].material.emissive.set(0xff0000);
+                    field.material.emissive.set(0xff0000);
+                    field.userData.legal = true;
                 }
             }
         }
@@ -269,8 +278,8 @@ export class Rook extends Piece {
 }
 
 export class Bishop extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh) {
+        super(type, color, row, column, mesh);
     }
 
     move_rules(board) {
@@ -278,8 +287,9 @@ export class Bishop extends Piece {
             if (board.children[i].type === "Field") {
                 const field = board.children[i];
 
-                if (Math.abs(field.userData.row - this.row) === Math.abs(field.userData.column - this.column)) {
+                if (Math.abs(field.userData.row - this.row) === Math.abs(field.userData.column - this.column) && !field.piece_on) {
                     field.material.emissive.set(0xff0000);
+                    field.userData.legal = true;
                 }
             }
         }
@@ -290,8 +300,8 @@ export class Bishop extends Piece {
 
 
 export class Pawn extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh) {
+        super(type, color, row, column, mesh);
     }
 
     move_rules(board) {
@@ -301,16 +311,20 @@ export class Pawn extends Piece {
             if (board.children[i].type === "Field") {
                 const field = board.children[i];
 
-                if (field.userData.row === this.row + direction && field.userData.column === this.column) {
+                if (field.userData.row === this.row + direction && field.userData.column === this.column
+                    && !field.piece_on) {
                     field.material.emissive.set(0xff0000);
+                    field.userData.legal = true;
                 }
 
                 if (
                     (this.color === "white" && this.row === 1) ||
                     (this.color === "black" && this.row === 6)
                 ) {
-                    if (field.userData.row === this.row + 2 * direction && field.userData.column === this.column) {
+                    if (field.userData.row === this.row + 2 * direction && field.userData.column === this.column
+                        && !field.piece_on) {
                         field.material.emissive.set(0xff0000);
+                        field.userData.legal = true;
                     }
                 }
             }
@@ -323,11 +337,14 @@ export class Pawn extends Piece {
 
 
 export class Field{
-    constructor(row, column) {
+    constructor(row, column, material) {
             this.type = "ground";
             this.row = row;
             this.column = column;
             this.legal = false;
+            this.material = material
+            this.piece_on = false;
+            this.piece = null;
         }
 
 

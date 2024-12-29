@@ -156,12 +156,12 @@ export const green = () => new THREE.MeshStandardMaterial({
     emissive: 0x000000,      // Kolor emisji (np. czarny)
     emissiveIntensity: 1,    // Intensywność emisji
     metalness: 0.5,          // Metaliczność (opcjonalnie)
-    roughness: 0.5           // Chropowatość (opcjonalnie)
+    roughness: 1.0           // Chropowatość (opcjonalnie)
 });
 export const yellow = () => new THREE.MeshStandardMaterial({
     color: 0xc2c28c,         // Kolor podstawowy (np. zielony)
     emissive: 0x000000,      // Kolor emisji (np. czarny)
     emissiveIntensity: 1,    // Intensywność emisji
     metalness: 0.5,          // Metaliczność (opcjonalnie)
-    roughness: 0.5           // Chropowatość (opcjonalnie)
+    roughness: 1.0           // Chropowatość (opcjonalnie)
 });
