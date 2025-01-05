@@ -48,11 +48,14 @@ export class Piece {
 
     }
 
-    move_rules(board) {
+    move_rules(board,fieldArray) {
         throw new Error("Abstract method 'move_rules' must be implemented in derived class.");
     }
 
-    static async createPiece(type, color, row, column, translation_x, translation_z, board) {
+    static async createPiece(type, color, row, column, translation_x, translation_z, board, fieldArray) {
+
+        console.log(fieldArray)
+
 
         let Model3D;
         let tex_layers;
@@ -127,27 +130,27 @@ export class Piece {
             switch(type.toLowerCase())
             {
                 case "queen":
-                    piece.userData = new Queen("queen",color, row, column,piece);
+                    piece.userData = new Queen("queen",color, row, column, piece ,fieldArray);
                     board.add(piece);
                     return piece.userData
                 case "king":
-                    piece.userData =new King("king",color, row, column,piece);
+                    piece.userData =new King("king",color, row, column,piece,fieldArray);
                     board.add(piece);
                     return piece.userData
                 case "bishop":
-                    piece.userData =new Bishop("bishop",color, row, column,piece);
+                    piece.userData =new Bishop("bishop",color, row, column,piece,fieldArray);
                     board.add(piece);
                     return piece.userData
                 case "knight":
-                    piece.userData = new Knight("knight",color, row, column,piece);
+                    piece.userData = new Knight("knight",color, row, column,piece,fieldArray);
                     board.add(piece);
                     return piece.userData
                 case "pawn":
-                    piece.userData = new Pawn("pawn",color, row, column,piece);
+                    piece.userData = new Pawn("pawn",color, row, column,piece,fieldArray);
                     board.add(piece);
                     return piece.userData
                 case "rook":
-                    piece.userData = new Rook("rook",color, row, column,piece);
+                    piece.userData = new Rook("rook",color, row, column,piece,fieldArray);
                     board.add(piece);
                     return piece.userData
                 default:
@@ -161,8 +164,8 @@ export class Piece {
 }
 
 export class Queen extends Piece {
-    constructor(type, color, row, column, mesh) {
-        super(type, color, row, column, mesh);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
     move_rules(board) {
@@ -189,11 +192,11 @@ export class Queen extends Piece {
 
 
 export class King extends Piece {
-    constructor(type, color, row, column, mesh) {
-        super(type, color, row, column, mesh);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board) {
+    move_rules(board,fieldArray) {
         for (let i = 0; i < board.children.length; i++) {
             if (board.children[i].type === "Field") {
                 const field = board.children[i];
@@ -201,7 +204,8 @@ export class King extends Piece {
                 if (
                     Math.abs(field.userData.row - this.row) <= 1 &&
                     Math.abs(field.userData.column - this.column) <= 1 &&
-                    !field.piece_on
+                    !fieldArray[this.row][this.column].piece_on
+
                 ) {
                     field.material.emissive.set(0xff0000);
                     field.userData.legal = true;
@@ -214,11 +218,11 @@ export class King extends Piece {
 }
 
 export class Knight extends Piece {
-    constructor(type, color, row, column, mesh) {
-        super(type, color, row, column, mesh);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board) {
+    move_rules(board,fieldArray) {
         const knightMoves = [
             { row: -2, col: -1 },
             { row: -2, col: 1 },
@@ -254,11 +258,11 @@ export class Knight extends Piece {
 
 
 export class Rook extends Piece {
-    constructor(type, color, row, column, mesh) {
-        super(type, color, row, column, mesh);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board) {
+    move_rules(board,fieldArray) {
         for (let i = 0; i < board.children.length; i++) {
 
             if (board.children[i].type === "Field") {
@@ -278,11 +282,11 @@ export class Rook extends Piece {
 }
 
 export class Bishop extends Piece {
-    constructor(type, color, row, column, mesh) {
-        super(type, color, row, column, mesh);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board) {
+    move_rules(board,fieldArray) {
         for (let i = 0; i < board.children.length; i++) {
             if (board.children[i].type === "Field") {
                 const field = board.children[i];
@@ -300,11 +304,11 @@ export class Bishop extends Piece {
 
 
 export class Pawn extends Piece {
-    constructor(type, color, row, column, mesh) {
-        super(type, color, row, column, mesh);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board) {
+    move_rules(board,fieldArray) {
         const direction = this.color === "white" ? 1 : -1;
 
         for (let i = 0; i < board.children.length; i++) {

@@ -123,33 +123,33 @@ class ChessScene {
 
 
                 if (row === 1 || row === 6) {
-                    const pawn = pieces.Piece.createPiece("pawn", row === 1 ? "white" : "black", row, col, translation_x, translation_z, this.board)
+                    const pawn = pieces.Piece.createPiece("pawn", row === 1 ? "white" : "black", row, col, translation_x, translation_z, this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = pawn;
                 }
                 if ((row === 0 || row === 7 )&& (col === 2 || col === 5)) {
-                    const bishop = pieces.Piece.createPiece("bishop",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
+                    const bishop = pieces.Piece.createPiece("bishop",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = bishop;
                 }
 
                 if ((row === 0 || row === 7 )&& (col === 7 || col === 0)) {
-                    const rook =  pieces.Piece.createPiece("rook",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
+                    const rook =  pieces.Piece.createPiece("rook",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = rook;
                 }
                 if (col === 4 && (row === 7 || row === 0)){
-                    const queen = pieces.Piece.createPiece("queen",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
+                    const queen = pieces.Piece.createPiece("queen",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = queen;
                 }
                 if (col === 3 && (row === 7 || row === 0)){
-                    const king =  pieces.Piece.createPiece("king",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
+                    const king =  pieces.Piece.createPiece("king",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = king;
                 }
                 if ((row === 0 || row === 7) && (col === 6 || col === 1)){
-                    const knight =  pieces.Piece.createPiece("knight",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board)
+                    const knight =  pieces.Piece.createPiece("knight",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = knight;
                 }
@@ -280,7 +280,7 @@ class ChessScene {
                     this.draggable_obj = intersectedObject;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
-                    intersectedObject.userData.move_rules(this.board)
+                    intersectedObject.userData.move_rules(this.board,this.fieldArray)
                     this.is_draggable = true;
                     intersectedObject.userData.active = true;
                     // console.log(intersectedObject.userData.active)
