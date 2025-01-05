@@ -234,6 +234,11 @@ export class Knight extends Piece {
             if (board.children[i].type === "Field") {
                 const field = board.children[i];
 
+                if (field.userData.row === this.row && field.userData.column === this.column) {
+                    field.material.emissive.set(0xff0000);
+                    field.userData.legal = true;
+                }
+
                 knightMoves.forEach((move) => {
                     if (
                         field.userData.row === this.row + move.row &&
@@ -310,6 +315,11 @@ export class Pawn extends Piece {
         for (let i = 0; i < board.children.length; i++) {
             if (board.children[i].type === "Field") {
                 const field = board.children[i];
+
+                if (field.userData.row === this.row && field.userData.column === this.column) {
+                    field.material.emissive.set(0xff0000);
+                    field.userData.legal = true;
+                }
 
                 if (field.userData.row === this.row + direction && field.userData.column === this.column
                     && !field.piece_on) {
