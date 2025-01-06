@@ -126,32 +126,38 @@ class ChessScene {
                     const pawn = pieces.Piece.createPiece("pawn", row === 1 ? "white" : "black", row, col, translation_x, translation_z, this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = pawn;
+                    this.fieldArray[row][col].piece.color = (row === 1 ? "white" : "black");
                 }
                 if ((row === 0 || row === 7 )&& (col === 2 || col === 5)) {
                     const bishop = pieces.Piece.createPiece("bishop",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = bishop;
+                    this.fieldArray[row][col].piece.color = (row === 0 ? "white" : "black");
                 }
 
                 if ((row === 0 || row === 7 )&& (col === 7 || col === 0)) {
                     const rook =  pieces.Piece.createPiece("rook",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = rook;
+                    this.fieldArray[row][col].piece.color = (row === 0 ? "white" : "black");
                 }
                 if (col === 4 && (row === 7 || row === 0)){
                     const queen = pieces.Piece.createPiece("queen",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = queen;
+                    this.fieldArray[row][col].piece.color = (row === 0 ? "white" : "black");
                 }
                 if (col === 3 && (row === 7 || row === 0)){
                     const king =  pieces.Piece.createPiece("king",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = king;
+                    this.fieldArray[row][col].piece.color = (row === 0 ? "white" : "black");
                 }
                 if ((row === 0 || row === 7) && (col === 6 || col === 1)){
                     const knight =  pieces.Piece.createPiece("knight",row === 0 ? "white" :"black",row,col,translation_x,translation_z,this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = knight;
+                    this.fieldArray[row][col].piece.color = (row === 0 ? "white" : "black");
                 }
                 this.scene.add(this.board);
             }
