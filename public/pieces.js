@@ -168,24 +168,49 @@ export class Queen extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board) {
-        for (let i = 0; i < board.children.length; i++) {
-            if (board.children[i].type === "Field") {
-                const field = board.children[i];
+    move_rules(board, fieldArray) {
+        // Zaznacz bieżące pole jako zawsze legal
+        const currentField = board.children[this.row * 8 + this.column];
+        currentField.userData.legal = true;
+        currentField.material.emissive.set(0xff0000);
 
-                if (
-                    (field.userData.row === this.row ||
-                    field.userData.column === this.column ||
-                    Math.abs(field.userData.row - this.row) === Math.abs(field.userData.column - this.column))
-                    && !field.piece_on
-                ) {
+        const directions = [
+            { dr: -1, dc: 0 },   // up
+            { dr: 1, dc: 0 },    // down
+            { dr: 0, dc: -1 },   // left
+            { dr: 0, dc: 1 },    // right
+            { dr: -1, dc: -1 },  // up-left
+            { dr: -1, dc: 1 },   // up-right
+            { dr: 1, dc: -1 },   // down-left
+            { dr: 1, dc: 1 }     // down-right
+        ];
+
+        for (let dir of directions) {
+            let r = this.row + dir.dr;
+            let c = this.column + dir.dc;
+
+            while (r >= 0 && r < fieldArray.length && c >= 0 && c < fieldArray[r].length) {
+                const field = board.children[r * 8 + c];
+                if (field.userData.piece_on) {
+                    if (field.userData.piece.color == this.color) {
+                        console.log(field.userData.piece.color)
+                        field.userData.legal = false;
+                        break;
+                    } else {
+                        field.material.emissive.set(0xff0000);
+                        field.userData.legal = true;
+                        break;
+                    }
+                } else {
                     field.material.emissive.set(0xff0000);
                     field.userData.legal = true;
                 }
+                r += dir.dr;
+                c += dir.dc;
             }
         }
 
-        return "Queen can move diagonally, horizontally, or vertically any number of squares.";
+        return "Queen moves any number of squares in any direction.";
     }
 }
 
@@ -196,19 +221,32 @@ export class King extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board,fieldArray) {
+    move_rules(board, fieldArray) {
         for (let i = 0; i < board.children.length; i++) {
             if (board.children[i].type === "Field") {
                 const field = board.children[i];
 
-                if (
-                    Math.abs(field.userData.row - this.row) <= 1 &&
-                    Math.abs(field.userData.column - this.column) <= 1 &&
-                    !fieldArray[this.row][this.column].piece_on
+                const targetRow = field.userData.row;
+                const targetColumn = field.userData.column;
 
+                if (
+                    Math.abs(targetRow - this.row) <= 1 &&
+                    Math.abs(targetColumn - this.column) <= 1
                 ) {
-                    field.material.emissive.set(0xff0000);
                     field.userData.legal = true;
+
+                    const targetField = fieldArray[targetRow][targetColumn];
+                    if (targetField.piece_on) {
+                        const targetPiece = targetField.piece;
+
+                        if (targetPiece.color === this.color) {
+                            field.userData.legal = false;
+                        }
+                    }
+
+                    if (field.userData.legal) {
+                        field.material.emissive.set(0xff0000);
+                    }
                 }
             }
         }
@@ -222,8 +260,9 @@ export class Knight extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board,fieldArray) {
+    move_rules(board, fieldArray) {
         const knightMoves = [
+            { row: 0, col: 0},
             { row: -2, col: -1 },
             { row: -2, col: 1 },
             { row: -1, col: -2 },
@@ -237,20 +276,28 @@ export class Knight extends Piece {
         for (let i = 0; i < board.children.length; i++) {
             if (board.children[i].type === "Field") {
                 const field = board.children[i];
-
-                if (field.userData.row === this.row && field.userData.column === this.column) {
-                    field.material.emissive.set(0xff0000);
-                    field.userData.legal = true;
-                }
+                const targetRow = field.userData.row;
+                const targetColumn = field.userData.column;
 
                 knightMoves.forEach((move) => {
                     if (
-                        field.userData.row === this.row + move.row &&
-                        field.userData.column === this.column + move.col
-                        && !field.piece_on
+                        targetRow === this.row + move.row &&
+                        targetColumn === this.column + move.col
                     ) {
-                        field.material.emissive.set(0xff0000);
                         field.userData.legal = true;
+
+                        const targetField = fieldArray[targetRow][targetColumn];
+                        if (targetField.piece_on) {
+                            const targetPiece = targetField.piece;
+
+                            if (targetPiece.color === this.color && targetRow != this.row && targetColumn != this.column) {
+                                field.userData.legal = false;
+                            }
+                        }
+
+                        if (field.userData.legal) {
+                            field.material.emissive.set(0xff0000);
+                        }
                     }
                 });
             }
@@ -268,17 +315,40 @@ export class Rook extends Piece {
     }
 
     move_rules(board,fieldArray) {
-        for (let i = 0; i < board.children.length; i++) {
+        const currentField = board.children[this.row * 8 + this.column];
+        currentField.userData.legal = true;
+        currentField.material.emissive.set(0xff0000);
 
-            if (board.children[i].type === "Field") {
-                const field = board.children[i];
+        console.log(this.color);
 
-                if ((field.userData.row === this.row || field.userData.column === this.column)
-                    && !field.piece_on)
-                {
+        const directions = [
+            { dr: -1, dc: 0 },  // up
+            { dr: 1, dc: 0 },   // down
+            { dr: 0, dc: -1 },  // left
+            { dr: 0, dc: 1 }    // right
+        ];
+
+        for (let dir of directions) {
+            let r = this.row + dir.dr;
+            let c = this.column + dir.dc;
+
+            while (r >= 0 && r < fieldArray.length && c >= 0 && c < fieldArray[r].length) {
+                const field = board.children[r*8+c];
+                if (field.userData.piece_on) {
+                    if (field.userData.piece.color === this.color) {
+                        field.userData.legal = false;
+                        break;
+                    } else {
+                        field.material.emissive.set(0xff0000);
+                        field.userData.legal = true;
+                        break;
+                    }
+                } else {
                     field.material.emissive.set(0xff0000);
                     field.userData.legal = true;
                 }
+                r += dir.dr;
+                c += dir.dc;
             }
         }
 
@@ -291,19 +361,43 @@ export class Bishop extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board,fieldArray) {
-        for (let i = 0; i < board.children.length; i++) {
-            if (board.children[i].type === "Field") {
-                const field = board.children[i];
+    move_rules(board, fieldArray) {
+        const currentField = board.children[this.row * 8 + this.column];
+        currentField.userData.legal = true;
+        currentField.material.emissive.set(0xff0000);
 
-                if (Math.abs(field.userData.row - this.row) === Math.abs(field.userData.column - this.column) && !field.piece_on) {
+
+        const directions = [
+            { dr: -1, dc: -1 },  // up-left
+            { dr: -1, dc: 1 },   // up-right
+            { dr: 1, dc: -1 },   // down-left
+            { dr: 1, dc: 1 }     // down-right
+        ];
+
+        for (let dir of directions) {
+            let r = this.row + dir.dr;
+            let c = this.column + dir.dc;
+
+            while (r >= 0 && r < fieldArray.length && c >= 0 && c < fieldArray[r].length) {
+                const field = board.children[r * 8 + c];
+                if (field.userData.piece_on) {
+                    if (field.userData.piece.color === this.color) {
+                        field.userData.legal = false;
+                        break;
+                    } else {
+                        field.userData.legal = true;
+                        break;
+                    }
+                } else {
                     field.material.emissive.set(0xff0000);
                     field.userData.legal = true;
                 }
+                r += dir.dr;
+                c += dir.dc;
             }
         }
 
-        return "Bishop can move diagonally any number of squares.";
+        return "Bishop diagonally any number of squares.";
     }
 }
 
@@ -313,36 +407,36 @@ export class Pawn extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board,fieldArray) {
+    move_rules(board, fieldArray) {
         const direction = this.color === "white" ? 1 : -1;
+        const startRow = this.color === "white" ? 1 : 6;
 
-        for (let i = 0; i < board.children.length; i++) {
-            if (board.children[i].type === "Field") {
-                const field = board.children[i];
+        let fieldAhead = board.children[(this.row + direction) * 8 + this.column];
+        if (!fieldAhead.userData.piece_on) {
+            fieldAhead.material.emissive.set(0xff0000);
+            fieldAhead.userData.legal = true;
 
-                if (field.userData.row === this.row && field.userData.column === this.column) {
-                    field.material.emissive.set(0xff0000);
-                    field.userData.legal = true;
-                }
-
-                if (field.userData.row === this.row + direction && field.userData.column === this.column
-                    && !field.piece_on) {
-                    field.material.emissive.set(0xff0000);
-                    field.userData.legal = true;
-                }
-
-                if (
-                    (this.color === "white" && this.row === 1) ||
-                    (this.color === "black" && this.row === 6)
-                ) {
-                    if (field.userData.row === this.row + 2 * direction && field.userData.column === this.column
-                        && !field.piece_on) {
-                        field.material.emissive.set(0xff0000);
-                        field.userData.legal = true;
-                    }
+            if (this.row === startRow) {
+                let secondFieldAhead = board.children[(this.row + 2 * direction) * 8 + this.column];
+                if (!secondFieldAhead.userData.piece_on) {
+                    secondFieldAhead.material.emissive.set(0xff0000);
+                    secondFieldAhead.userData.legal = true;
                 }
             }
         }
+
+        const diagonalDirections = [-1, 1];
+        for (let dc of diagonalDirections) {
+            let fieldDiagonal = board.children[(this.row + direction) * 8 + (this.column + dc)];
+            if (fieldDiagonal && fieldDiagonal.userData.piece_on && fieldDiagonal.userData.piece.color !== this.color) {
+                fieldDiagonal.material.emissive.set(0xff0000);
+                fieldDiagonal.userData.legal = true;
+            }
+        }
+
+        const currentField = board.children[this.row * 8 + this.column];
+        currentField.material.emissive.set(0xff0000);
+        currentField.userData.legal = true;
 
         return "Pawn can move forward one square, optionally two if in its starting position, and capture diagonally.";
     }
