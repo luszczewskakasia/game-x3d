@@ -385,6 +385,7 @@ export class Bishop extends Piece {
                         field.userData.legal = false;
                         break;
                     } else {
+                        field.material.emissive.set(0xff0000);
                         field.userData.legal = true;
                         break;
                     }
