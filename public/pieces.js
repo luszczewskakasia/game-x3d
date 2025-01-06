@@ -168,8 +168,7 @@ export class Queen extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board, fieldArray) {
-        // Zaznacz bieżące pole jako zawsze legal
+    move_rules(board, fieldArray) {l
         const currentField = board.children[this.row * 8 + this.column];
         currentField.userData.legal = true;
         currentField.material.emissive.set(0xff0000);
