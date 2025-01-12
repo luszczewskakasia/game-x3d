@@ -4,6 +4,8 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as tex from './textures.js';
 import * as pieces from './pieces.js';
 import { Animation } from './animation.js';
+import  {addCapturedPiece} from './HUD.js'
+
 // import scene from "three/examples/jsm/offscreen/scene";
 
 let board;
@@ -78,7 +80,10 @@ class ChessScene {
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setClearColor(0x2f2f2f);
         renderer.shadowMap.enabled = true;
-        document.body.appendChild(renderer.domElement);
+
+        const mainColumn = document.querySelector('.main-column');
+        mainColumn.appendChild(renderer.domElement);
+        // document.body.appendChild(renderer.domElement);
         return renderer;
     }
 
@@ -97,7 +102,7 @@ class ChessScene {
         this.scene.add(background_cube);
         // pieces.PiecesGeneration(this.board)
 
-
+        // addCapturedPiece('white',"pawn");
 
         const square_size = 1;
         const rows = 8;
@@ -228,26 +233,26 @@ class ChessScene {
                     if (piece instanceof Promise) {
                         piece.then(piece => {
                             if (!piece) {
-                                console.error(`Piece is undefined at row ${row}, col ${col}`);
+                                // console.error(`Piece is undefined at row ${row}, col ${col}`);
                                 return;
                             }
                             const Mesh = piece.mesh;
                             if (!Mesh) {
-                                console.error(`Mesh is undefined in piece at row ${row}, col ${col}`);
+                                // console.error(`Mesh is undefined in piece at row ${row}, col ${col}`);
                                 return;
                             }
                             this.board.remove(Mesh);
-                            console.log(`Removed mesh from row ${row}, col ${col}`);
+                            // console.log(`Removed mesh from row ${row}, col ${col}`);
                         }).catch(error => {
-                            console.error(`Error resolving piece promise: ${error}`);
+                            // console.error(`Error resolving piece promise: ${error}`);
                         });
                     } else {
                         const Mesh = piece.mesh;
                         if (Mesh) {
                             this.board.remove(Mesh);
-                            console.log(`Removed mesh from row ${row}, col ${col}`);
+                            // console.log(`Removed mesh from row ${row}, col ${col}`);
                         } else {
-                            console.error(`Mesh is undefined in piece at row ${row}, col ${col}`);
+                            // console.error(`Mesh is undefined in piece at row ${row}, col ${col}`);
                         }
                     }
                 }
@@ -295,7 +300,7 @@ class ChessScene {
                 }
             }
         } else {
-            console.log('Nothing found');
+            // console.log('Nothing found');
         }
     }
 

@@ -3,25 +3,48 @@
 <head>
   <meta charset="utf-8">
   <title>Chess</title>
-  <style>
-    body { margin: 0; }
-  </style>
-	<script src="/socket.io/socket.io.js"></script>
-	<!-- <script src="lib/socket.io-1.2.0.js"></script>
-	<script src="lib/jquery-1.11.1.js"></script>  -->
-	<!-- <script src="server_client.js"></script> -->
-
+  <link rel="stylesheet" href="./chess_hud.css">
+  <script src="/socket.io/socket.io.js"></script>
   <script type="importmap">
-	{
-	  "imports": {
-		"three": "https://unpkg.com/three/build/three.module.js",
-		"three/addons/": "https://unpkg.com/three/examples/jsm/"
-	  }
-	}
+    {
+      "imports": {
+        "three": "https://unpkg.com/three/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three/examples/jsm/"
+      }
+    }
   </script>
-
 </head>
 <body>
-	<script type="module" src="/main.js"></script>
+  <div class="main-column">
+    <script type="module" src="/main.js"></script>
+  </div>
+  <div class="overlay-column left">
+    <div class="profile-info">
+      <div class="Profile_photo">
+          <img class="Profile_photo-img" src="path/to/your/image.jpg" alt="Profile Photo">
+      </div>
+      <div class="Profile_name">Player-1</div>
+    </div>
+    <div class="clock-container">
+      <div class = clock>10:00</div>
+    </div>
+    <div class = points_pieces_container>
+      <div class = points_pieces id="White_Player"></div>
+    </div>
+  </div>
+  <div class="overlay-column right">
+    <div class="profile-info">
+      <div class="Profile_photo">
+          <img class="Profile_photo-img" src="path/to/your/image.jpg" alt="Profile Photo">
+      </div>
+      <div class="Profile_name">Player-1</div>
+    </div>
+    <div class="clock-container">
+      <div class = clock>10:00</div>
+    </div>
+    <div class = points_pieces_container >
+      <div class = points_pieces id="Black_Player"></div>
+    </div>
+  </div>
 </body>
 </html>

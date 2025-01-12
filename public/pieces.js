@@ -54,7 +54,7 @@ export class Piece {
 
     static async createPiece(type, color, row, column, translation_x, translation_z, board, fieldArray) {
 
-        console.log(fieldArray)
+        // console.log(fieldArray)
 
 
         let Model3D;
