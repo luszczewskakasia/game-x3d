@@ -10,8 +10,6 @@ import  * as hud from './HUD.js'
 
 let board;
 
-// const client = io();
-
 
 class ChessScene {
     constructor() {
@@ -36,7 +34,7 @@ class ChessScene {
         };
         this.pointsBlack = 0;
         this.pointsWhite = 0;
-        // this.client = io();
+
         this.init_scene();
 
         this.init_event_listeners();  
@@ -98,14 +96,19 @@ class ChessScene {
     }
 
     create_chessboard() {
-        const background_geo = new THREE.BoxGeometry(9, 1, 9);
-        const background_material = new THREE.MeshBasicMaterial({ color: 0x964B00 });
-        const background_cube = new THREE.Mesh(background_geo, background_material);
-        this.scene.add(background_cube);
+    //     const background_geo = new THREE.BoxGeometry(9, 1, 9);
+    //     const background_material = new THREE.MeshBasicMaterial({ color: 0x964B00 });
+    //     const background_cube = new THREE.Mesh(background_geo, background_material);
+    //     this.scene.add(background_cube);
+        tex.create_chessboard_mesh().then((chessboard) => {
+            console.log(chessboard)
+            this.scene.add(chessboard);
+        })
+        this.scene.add(tex.create_chessboard_mesh())
         const square_size = 1;
         const rows = 8;
         const cols = 8;
-        const square_geo = new THREE.BoxGeometry(square_size, 0.1, square_size);
+        const square_geo = new THREE.BoxGeometry(square_size-0.04, 0.1, square_size-0.04);
         this.board = new THREE.Group();
 
 
@@ -168,14 +171,23 @@ class ChessScene {
         this.loaded_scene = true;
         // console.log(this.board);
 
-        // Uruchom zegar z początkowym czasem 10 minut
-        
+        hud.ClockAnimation(600,600,this)
 
     }
 
 
     animate() {
         this.drag_object(); 
+        if (this.loaded_scene) {
+            // setTimeout(() => {
+            //     Animation.bounce(this.scene, 3, 1, 0.5, 0);
+            // }, 5000);
+
+            // setTimeout(() => {
+            //     Animation.second_order_model(this.scene, 0, params, 0.5);
+            // }, 5000);
+            
+        }
         this.renderer.render(this.scene, this.camera);
     }
 
@@ -187,9 +199,6 @@ class ChessScene {
         });
         document.getElementById('White_resignButton').addEventListener('click', () => {
             hud.endGame('black');
-        });
-        document.getElementById('Black_startButton').addEventListener('click', () => {
-            hud.ClockAnimation(600, 600, this);
         });
     }
 
@@ -217,16 +226,11 @@ class ChessScene {
             if(this.fieldArray[row][col].legal && (this.fieldArray[row][col].piece == null ||
                 this.fieldArray[row][col].piece.color !== this.draggable_obj.userData.color))
             {
-
-                // console.log(this.draggable_obj.userData);
-                // console.log(this.fieldArray[row][col].piece);
                 if(this.draggable_obj.userData.row !== row || this.draggable_obj.userData.column !== col)
                 {
                     this.turn = !this.turn;
                     this.draggable_obj.userData.row = row
                     this.draggable_obj.userData.column = col
-
-                    sendMove({ fromRow, fromCol, toRow: row, toCol: col });
                 }
 
                 if(this.fieldArray[row][col].piece != null && this.fieldArray[row][col].piece.color !== this.draggable_obj.userData.color)
@@ -244,16 +248,12 @@ class ChessScene {
                             }
                             hud.addCapturedPiece(piece.color, piece.type,this)
                             this.board.remove(Mesh);
-                        }).catch(error => {
-                        });
+                        })
                     } else {
                         const Mesh = piece.mesh;
                         if (Mesh) {
                             hud.addCapturedPiece(piece.color, piece.type,this)
                             this.board.remove(Mesh);
-                            // console.log(`Removed mesh from row ${row}, col ${col}`);
-                        } else {
-                            // console.error(`Mesh is undefined in piece at row ${row}, col ${col}`);
                         }
                     }
                 }
@@ -290,7 +290,6 @@ class ChessScene {
                 {
                     this.draggable_obj = intersectedObject;
                     Animation.Piece_up(this.draggable_obj,this.is_Animating)
-                    //this.client.emit('moveUp', { data: intersectedObject.userData });
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
                     intersectedObject.userData.move_rules(this.board,this.fieldArray)
@@ -308,28 +307,6 @@ class ChessScene {
     handle_mouse_move(event) {
         this.move_mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.move_mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
-        // const intersects = this.raycaster.intersectObjects(this.scene.children);
-
-        // if (intersects.length > 0) {
-        //     const intersectedObject = intersects[0].object;
-
-        //     // If it's a valid object and the object has been hovered previously
-        //     if (this.lastHoveredObject && this.lastHoveredObject !== intersectedObject) {
-        //         // Reset the emissive color of the previously hovered object
-                
-        //     }
-
-        //     // Change the color of the currently hovered object
-        //     intersectedObject.material.emissive.set(0xff0000);
-
-        //     // Update the last hovered object
-        //     this.lastHoveredObject = intersectedObject;
-        // } else {
-        //     // If nothing is intersected, reset the emissive color of the last hovered object
-        //     if (this.lastHoveredObject) {
-        //         this.lastHoveredObject.material.emissive.set(0x000000);
-        //     }
-        // }
 
     }
 
@@ -346,7 +323,7 @@ class ChessScene {
                         this.draggable_obj.userData.setPosition = obj.point.clone()
                     }
                     // var setPointPrime =obj.point.clone().sub( this.draggable_obj.position.clone());
-                   // Animation.second_order_model(this.draggable_obj , this.params, 0.05,this.is_Animating);
+                    Animation.second_order_model(this.draggable_obj , this.params, 0.05,this.is_Animating);
                     // this.draggable_obj.position.x = obj.point.x
                     // this.draggable_obj.position.z = obj.point.z
 
