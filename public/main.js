@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as tex from './textures.js';
 import * as pieces from './pieces.js';
 import { Animation } from './animation.js';
-import  {addCapturedPiece} from './HUD.js'
+import  * as hud from './HUD.js'
 
 // import scene from "three/examples/jsm/offscreen/scene";
 
@@ -24,16 +24,16 @@ class ChessScene {
         this.is_draggable = false;
         this.board = null;
         this.loaded_scene = false;
-
         this.turn = true;
-
+        this.is_Animating = false;
         this.fieldArray = [];
         this.params = {
             damping: 2.0,
             frequency: 0.4,
             response_factor: 0
         };
-
+        this.pointsBlack = 0;
+        this.pointsWhite = 0;
 
         this.init_scene();
 
@@ -100,10 +100,6 @@ class ChessScene {
         const background_material = new THREE.MeshBasicMaterial({ color: 0x964B00 });
         const background_cube = new THREE.Mesh(background_geo, background_material);
         this.scene.add(background_cube);
-        // pieces.PiecesGeneration(this.board)
-
-        // addCapturedPiece('white',"pawn");
-
         const square_size = 1;
         const rows = 8;
         const cols = 8;
@@ -169,6 +165,9 @@ class ChessScene {
         }
         this.loaded_scene = true;
         // console.log(this.board);
+
+        hud.ClockAnimation(600,600,this)
+
     }
 
 
@@ -190,6 +189,12 @@ class ChessScene {
     init_event_listeners() {
         window.addEventListener('click', event => this.handle_mouse_click(event));
         window.addEventListener('mousemove', event => this.handle_mouse_move(event));
+        document.getElementById('Black_resignButton').addEventListener('click', () => {
+            hud.endGame('white');
+        });
+        document.getElementById('White_resignButton').addEventListener('click', () => {
+            hud.endGame('black');
+        });
     }
 
     handle_mouse_click(event) {
@@ -214,41 +219,39 @@ class ChessScene {
 
 
             if(this.fieldArray[row][col].legal && (this.fieldArray[row][col].piece == null ||
-                this.fieldArray[row][col].piece.color != this.draggable_obj.userData.color))
+                this.fieldArray[row][col].piece.color !== this.draggable_obj.userData.color))
             {
 
                 // console.log(this.draggable_obj.userData);
                 // console.log(this.fieldArray[row][col].piece);
-                if(this.draggable_obj.userData.row != row || this.draggable_obj.userData.column != col)
+                if(this.draggable_obj.userData.row !== row || this.draggable_obj.userData.column !== col)
                 {
                     this.turn = !this.turn;
                     this.draggable_obj.userData.row = row
                     this.draggable_obj.userData.column = col
                 }
 
-                if(this.fieldArray[row][col].piece != null && this.fieldArray[row][col].piece.color != this.draggable_obj.userData.color)
+                if(this.fieldArray[row][col].piece != null && this.fieldArray[row][col].piece.color !== this.draggable_obj.userData.color)
                 {
-                const piece = this.fieldArray[row][col].piece;
+                var piece = this.fieldArray[row][col].piece;
 
                     if (piece instanceof Promise) {
                         piece.then(piece => {
                             if (!piece) {
-                                // console.error(`Piece is undefined at row ${row}, col ${col}`);
                                 return;
                             }
                             const Mesh = piece.mesh;
                             if (!Mesh) {
-                                // console.error(`Mesh is undefined in piece at row ${row}, col ${col}`);
                                 return;
                             }
+                            hud.addCapturedPiece(piece.color, piece.type,this)
                             this.board.remove(Mesh);
-                            // console.log(`Removed mesh from row ${row}, col ${col}`);
                         }).catch(error => {
-                            // console.error(`Error resolving piece promise: ${error}`);
                         });
                     } else {
                         const Mesh = piece.mesh;
                         if (Mesh) {
+                            hud.addCapturedPiece(piece.color, piece.type,this)
                             this.board.remove(Mesh);
                             // console.log(`Removed mesh from row ${row}, col ${col}`);
                         } else {
@@ -263,12 +266,9 @@ class ChessScene {
                 this.is_draggable = false;
                 // console.log(`Dropped at: ${target_pos_x}, ${target_pos_z}`);
 
-
                 this.clear_board();
                 this.change_emission(this.draggable_obj);
                 this.draggable_obj = null;
-
-
                 return;
             }
         }
@@ -285,8 +285,8 @@ class ChessScene {
 
             if (!intersectedObject.userData.active && intersectedObject.userData.draggable) {
                 if(
-                    (this.turn && intersectedObject.userData.color == "white") ||
-                    (!this.turn && intersectedObject.userData.color == "black"))
+                    (this.turn && intersectedObject.userData.color === "white") ||
+                    (!this.turn && intersectedObject.userData.color === "black"))
                 {
                     this.draggable_obj = intersectedObject;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
@@ -294,7 +294,6 @@ class ChessScene {
                     intersectedObject.userData.move_rules(this.board,this.fieldArray)
                     this.is_draggable = true;
                     intersectedObject.userData.active = true;
-                    // console.log(intersectedObject.userData.active)
                     this.change_emission(intersectedObject);
 
                 }
@@ -314,22 +313,16 @@ class ChessScene {
         if (this.is_draggable && this.draggable_obj) {
             this.raycaster.setFromCamera(this.move_mouse, this.camera);
             const intersects = this.raycaster.intersectObjects(this.board.children);
-            
             if (intersects.length > 0) {
                 for (let obj of intersects) {
-
                     if (obj.object.userData.type != 'ground') continue;
-
-
                     if (this.draggable_obj.userData.active)
                     {
                         this.draggable_obj.userData.setPositionPrime = obj.point.clone().sub( this.draggable_obj.userData.setPosition.clone());
                         this.draggable_obj.userData.setPosition = obj.point.clone()
                     }
                     // var setPointPrime =obj.point.clone().sub( this.draggable_obj.position.clone());
-
-                    Animation.second_order_model(this.draggable_obj , this.params, 0.05);
-
+                    Animation.second_order_model(this.draggable_obj , this.params, 0.05,this.is_Animating);
                     // this.draggable_obj.position.x = obj.point.x
                     // this.draggable_obj.position.z = obj.point.z
 
@@ -370,8 +363,12 @@ class ChessScene {
         const new_value = ((value - min_old) / (max_old - min_old)) * (max_new - min_new) + min_new;
         return Math.round(new_value);
     }
+
+
+
+
 }
 
-const chess_scene = new ChessScene();
+export const chess_scene = new ChessScene();
 
 // initScene();

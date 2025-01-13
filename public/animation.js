@@ -32,7 +32,8 @@ export class Animation {
     }
 
 
-    static second_order_model(object, params, deltaTime) {
+    static second_order_model(object, params, deltaTime, is_Animating) {
+        is_Animating = true;
         const { damping, frequency, response_factor } = params;
         let setpoint = object.userData.setPosition.clone();
         let setpointPrime = object.userData.setPositionPrime.clone();
@@ -88,5 +89,23 @@ export class Animation {
         {
             requestAnimationFrame(() => simulate());
         }
+        else
+        {
+           is_Animating = false;
+        }
     }
+
+
+    static Piece_up(object, is_Animating)
+    {
+
+
+
+    }
+
+    static Piece_down(object, is_Animating)
+    {
+
+    }
+
 }

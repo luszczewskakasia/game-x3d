@@ -168,7 +168,7 @@ export class Queen extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board, fieldArray) {l
+    move_rules(board, fieldArray) {
         const currentField = board.children[this.row * 8 + this.column];
         currentField.userData.legal = true;
         currentField.material.emissive.set(0xff0000);
