@@ -19,23 +19,28 @@ app.get('/', (req, res) => {
 // słucha sobie połączeń między klientami na serwer
 io.on('connection', (socket) => {
   let username = null;
-  // czeka na dostanie imienia które jest emitowane od tego klienta (socket)
-  // połączenie  do konkretnego klienta z serwera hosta
-  // instancja do konkretnego klienta
+
+  // Handle the username registration
   socket.on('username', (name) => {
-    username = name;
-    if (players.length >= 2){
-      observer.push(username);
-      socket.emit('role', 'observer');
-      console.log('Observer ', username, ' joined the game');
-    } else {
-      players.push(username);
-      socket.emit('role','player');
-      console.log('Player ', username, ' joined the game')
-    }
-  
-    });
-  })
+      username = name;
+      if (players.length >= 2) {
+          observer.push(username);
+          socket.emit('role', 'observer');
+          console.log('Obserwator ', username, ' dołączył do gry');
+      } else if (players.length === 1) {
+          players.push(username);
+          socket.emit('role', 'player2');
+          console.log('Gracz ', username, ' dołączył do gry');
+      } else {
+          players.push(username);
+          socket.emit('role', 'player1');
+          console.log('Gracz ', username, ' dołączył do gry');
+      }
+
+      io.emit('updatePlayers', players);
+  });
+});
+
 
 
 server.listen(5000, () => {

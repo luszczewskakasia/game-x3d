@@ -34,7 +34,6 @@ class ChessScene {
         };
         this.pointsBlack = 0;
         this.pointsWhite = 0;
-
         this.init_scene();
 
         this.init_event_listeners();  
@@ -166,23 +165,14 @@ class ChessScene {
         this.loaded_scene = true;
         // console.log(this.board);
 
-        hud.ClockAnimation(600,600,this)
+        // Uruchom zegar z początkowym czasem 10 minut
+        hud.ClockAnimation(600, 600, this);
 
     }
 
 
     animate() {
         this.drag_object(); 
-        if (this.loaded_scene) {
-            // setTimeout(() => {
-            //     Animation.bounce(this.scene, 3, 1, 0.5, 0);
-            // }, 5000);
-
-            // setTimeout(() => {
-            //     Animation.second_order_model(this.scene, 0, params, 0.5);
-            // }, 5000);
-            
-        }
         this.renderer.render(this.scene, this.camera);
     }
 

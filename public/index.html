@@ -5,6 +5,9 @@
   <title>Chess</title>
   <link rel="stylesheet" href="./chess_hud.css">
   <script src="/socket.io/socket.io.js"></script>
+  <script src="lib/socket.io-1.2.0.js"></script>
+  <script src="lib/jquery-1.11.1.js"></script> 
+  <script src="server_client.js"></script>
   <script type="importmap">
     {
       "imports": {
@@ -20,7 +23,7 @@
      <div id="endGameBar" class="end-game-bar">
         <div class="end-game-content">
             <p id="endGameMessage">Partia zakończona!</p>
-            <button id="restartButton">Zagraj ponownie</button>
+            <button id="restartButton" onClick="window.location.reload();">Zagraj ponownie</button>
 <!--            <button id="closeButton">Zamknij</button>-->
         </div>
     </div>

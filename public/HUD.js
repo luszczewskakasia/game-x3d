@@ -1,4 +1,3 @@
-
 export function addCapturedPiece(pieceColor, pieceType, chess_scene) {
     const span = document.createElement('span');
     let imageUrl = '';
