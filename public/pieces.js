@@ -99,8 +99,6 @@ export class Piece {
                 throw new Error(`Unsupported piece type: ${type}`);
         }
 
-
-
         return loader.loadAsync(Model3D).then((group) => {
 
             const piece = group.children[0]

@@ -268,6 +268,8 @@ class ChessScene {
 
                 this.clear_board();
                 this.change_emission(this.draggable_obj);
+                console.log("koniec")
+                Animation.Piece_down(this.draggable_obj, this.is_Animating)
                 this.draggable_obj = null;
                 return;
             }
@@ -289,6 +291,7 @@ class ChessScene {
                     (!this.turn && intersectedObject.userData.color === "black"))
                 {
                     this.draggable_obj = intersectedObject;
+                    Animation.Piece_up(this.draggable_obj,this.is_Animating)
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
                     intersectedObject.userData.move_rules(this.board,this.fieldArray)
@@ -363,12 +366,8 @@ class ChessScene {
         const new_value = ((value - min_old) / (max_old - min_old)) * (max_new - min_new) + min_new;
         return Math.round(new_value);
     }
-
-
-
-
 }
 
-export const chess_scene = new ChessScene();
+const chess_scene = new ChessScene();
 
 // initScene();
