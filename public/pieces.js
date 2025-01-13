@@ -1,6 +1,17 @@
 import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.135.0/examples/jsm/loaders/OBJLoader.js';
 import * as THREE from 'three';
 import * as tex from './textures.js';
+import {
+    createKingMaterialGold,
+    createKnightMaterialMarble,
+    createKnightMaterialMarbleO,
+    createKnightMaterialObsidian,
+    createKnightMaterialObsidianM,
+    createQueenMaterialGold,
+    createQueenMaterialMarble,
+    createQueenMaterialObsidian,
+    createQueenMaterialSatin
+} from "./textures.js";
 // import * as main from './main';
 
 // const board = main.board
@@ -16,26 +27,35 @@ const knightModelPath = "konik.obj";
 
 
 export class Piece {
-    constructor(type, color, row, column) {
+    constructor(type, color, row, column, mesh) {
         if (new.target === Piece) {
             throw new Error("Cannot instantiate an abstract class.");
         }
-        this.type = this.constructor.name.toLowerCase();
+        this.type = type.toLowerCase();
         this.row = row;
         this.column = column;
         this.color = color;
+        this.active = false;
+        this.draggable = true;
+        this.name = `${this.type}_${row}_${column}`;
         const square_size = 1;
         const translation_x = (column - 7/ 2) * square_size;
         const translation_z = (row - 7/ 2) * square_size;
+        this.setPosition = new THREE.Vector3(translation_x,0.5,translation_z);
+        this.setPositionPrime = new THREE.Vector3(0,0.0,0);
+        this.mesh = mesh
         // this.model3D = this.createPiece(type,color,row,column,translation_x,translation_z);
 
     }
 
-    move_rules() {
+    move_rules(board,fieldArray) {
         throw new Error("Abstract method 'move_rules' must be implemented in derived class.");
     }
 
-    static async createPiece(type, color, row, column, translation_x, translation_z, board) {
+    static async createPiece(type, color, row, column, translation_x, translation_z, board, fieldArray) {
+
+        // console.log(fieldArray)
+
 
         let Model3D;
         let tex_layers;
@@ -46,33 +66,33 @@ export class Piece {
             case "queen":
                 Model3D = queenModelPath;
                 tex_layers = 3;
-                textures = [tex.queen_gold,color === "white" ? tex.queen_obsidian : tex.queen_marble,tex.queen_satin];
+                textures = [tex.createQueenMaterialGold(),color === "black" ? tex.createQueenMaterialObsidian() : tex.createQueenMaterialMarble(),tex.createQueenMaterialSatin()];
                 break;
 
             case "king":
                 Model3D = kingModelPath;
                 tex_layers = 3;
-                textures = [color === "white" ? tex.king_obsidian : tex.king_marble,tex.king_satin,tex.king_gold];
+                textures = [color === "black" ? tex.createKingMaterialObsidian() : tex.createKingMaterialMarble(),tex.createKingMaterialSatin(),tex.createKingMaterialGold()];
                 break;
             case "bishop":
                 Model3D = bishopModelPath;
                 tex_layers = 1;
-                textures = [color === "white" ? tex.bishopMaterialBlack : tex.bishopMaterialWhite];
+                textures = [color === "black" ? tex.createBishopMaterialBlack() : tex.createBishopMaterialWhite()];
                 break;
             case "knight":
                 Model3D = knightModelPath;
                 tex_layers = 3;
-                textures = [color === "white" ? tex.knight_obsidian : tex.knight_marble,tex.knight_gold,color === "white" ? tex.knight_obsidian_m : tex.knight_marble_o];
+                textures = [color === "black" ? tex.createKnightMaterialObsidian() : tex.createKnightMaterialMarble(),tex.createKingMaterialGold(),color === "white" ? tex.createKnightMaterialObsidianM() : tex.createKnightMaterialMarbleO()];
                 break;
             case "pawn":
                 Model3D = pawnModelPath;
                 tex_layers = 1;
-                textures = [color === "white" ? tex.pawnMaterialBlack : tex.pawnMaterialWhite];
+                textures = [color === "black" ? tex.createPawnMaterialBlack() : tex.createPawnMaterialWhite()];
                 break;
             case "rook":
                 Model3D = rookModelPath;
                 tex_layers = 1;
-                textures = [color === "white" ? tex.rookMaterialBlack : tex.rookMaterialWhite];
+                textures = [color === "black" ? tex.createRookMaterialBlack() : tex.createRookMaterialWhite()];
                 break;
 
             default:
@@ -82,11 +102,14 @@ export class Piece {
 
 
         return loader.loadAsync(Model3D).then((group) => {
-            const piece = group.children[0];
+
+            const piece = group.children[0]
+
             piece.scale.set(0.5, 0.5, 0.5);
             piece.position.set(translation_x, 0.5, translation_z);
             piece.castShadow = true;
             piece.receiveShadow = true;
+            piece.type = "Piece"
             piece.traverse(function (child) {
                 if (child.isMesh) {
                     if(tex_layers === 1)
@@ -103,25 +126,33 @@ export class Piece {
 
                 }
             });
-            piece.userData.draggable = true;
-            piece.userData.name = type.toLowerCase();
-            console.log('piece created')
 
-            board.add(piece);
             switch(type.toLowerCase())
             {
                 case "queen":
-                    return new Queen(color, row, column, piece);
+                    piece.userData = new Queen("queen",color, row, column, piece ,fieldArray);
+                    board.add(piece);
+                    return piece.userData
                 case "king":
-                    return new King(color, row, column, piece);
+                    piece.userData =new King("king",color, row, column,piece,fieldArray);
+                    board.add(piece);
+                    return piece.userData
                 case "bishop":
-                    return new Bishop(color, row, column, piece);
+                    piece.userData =new Bishop("bishop",color, row, column,piece,fieldArray);
+                    board.add(piece);
+                    return piece.userData
                 case "knight":
-                    return new Knight(color, row, column, piece);
+                    piece.userData = new Knight("knight",color, row, column,piece,fieldArray);
+                    board.add(piece);
+                    return piece.userData
                 case "pawn":
-                    return new Pawn(color, row, column, piece);
+                    piece.userData = new Pawn("pawn",color, row, column,piece,fieldArray);
+                    board.add(piece);
+                    return piece.userData
                 case "rook":
-                    return new Rook(color, row, column, piece);
+                    piece.userData = new Rook("rook",color, row, column,piece,fieldArray);
+                    board.add(piece);
+                    return piece.userData
                 default:
                     throw new Error(`Unsupported piece type: ${type}`);
 
@@ -133,69 +164,296 @@ export class Piece {
 }
 
 export class Queen extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules() {
-        return "Queen can move diagonally, horizontally, or vertically any number of squares.";
+    move_rules(board, fieldArray) {
+        const currentField = board.children[this.row * 8 + this.column];
+        currentField.userData.legal = true;
+        currentField.material.emissive.set(0xff0000);
+
+        const directions = [
+            { dr: -1, dc: 0 },   // up
+            { dr: 1, dc: 0 },    // down
+            { dr: 0, dc: -1 },   // left
+            { dr: 0, dc: 1 },    // right
+            { dr: -1, dc: -1 },  // up-left
+            { dr: -1, dc: 1 },   // up-right
+            { dr: 1, dc: -1 },   // down-left
+            { dr: 1, dc: 1 }     // down-right
+        ];
+
+        for (let dir of directions) {
+            let r = this.row + dir.dr;
+            let c = this.column + dir.dc;
+
+            while (r >= 0 && r < fieldArray.length && c >= 0 && c < fieldArray[r].length) {
+                const field = board.children[r * 8 + c];
+                if (field.userData.piece_on) {
+                    if (field.userData.piece.color == this.color) {
+                        console.log(field.userData.piece.color)
+                        field.userData.legal = false;
+                        break;
+                    } else {
+                        field.material.emissive.set(0xff0000);
+                        field.userData.legal = true;
+                        break;
+                    }
+                } else {
+                    field.material.emissive.set(0xff0000);
+                    field.userData.legal = true;
+                }
+                r += dir.dr;
+                c += dir.dc;
+            }
+        }
+
+        return "Queen moves any number of squares in any direction.";
     }
 }
 
 
 
 export class King extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules() {
+    move_rules(board, fieldArray) {
+        for (let i = 0; i < board.children.length; i++) {
+            if (board.children[i].type === "Field") {
+                const field = board.children[i];
+
+                const targetRow = field.userData.row;
+                const targetColumn = field.userData.column;
+
+                if (
+                    Math.abs(targetRow - this.row) <= 1 &&
+                    Math.abs(targetColumn - this.column) <= 1
+                ) {
+                    field.userData.legal = true;
+
+                    const targetField = fieldArray[targetRow][targetColumn];
+                    if (targetField.piece_on) {
+                        const targetPiece = targetField.piece;
+
+                        if (targetPiece.color === this.color) {
+                            field.userData.legal = false;
+                        }
+                    }
+
+                    if (field.userData.legal) {
+                        field.material.emissive.set(0xff0000);
+                    }
+                }
+            }
+        }
+
         return "King can move one square in any direction.";
     }
 }
 
 export class Knight extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules() {
-        return "Knight moves like L shape";
+    move_rules(board, fieldArray) {
+        const knightMoves = [
+            { row: 0, col: 0},
+            { row: -2, col: -1 },
+            { row: -2, col: 1 },
+            { row: -1, col: -2 },
+            { row: -1, col: 2 },
+            { row: 1, col: -2 },
+            { row: 1, col: 2 },
+            { row: 2, col: -1 },
+            { row: 2, col: 1 }
+        ];
+
+        for (let i = 0; i < board.children.length; i++) {
+            if (board.children[i].type === "Field") {
+                const field = board.children[i];
+                const targetRow = field.userData.row;
+                const targetColumn = field.userData.column;
+
+                knightMoves.forEach((move) => {
+                    if (
+                        targetRow === this.row + move.row &&
+                        targetColumn === this.column + move.col
+                    ) {
+                        field.userData.legal = true;
+
+                        const targetField = fieldArray[targetRow][targetColumn];
+                        if (targetField.piece_on) {
+                            const targetPiece = targetField.piece;
+
+                            if (targetPiece.color === this.color && targetRow != this.row && targetColumn != this.column) {
+                                field.userData.legal = false;
+                            }
+                        }
+
+                        if (field.userData.legal) {
+                            field.material.emissive.set(0xff0000);
+                        }
+                    }
+                });
+            }
+        }
+
+        return "Knight moves in an L shape.";
     }
 }
 
 
 
 export class Rook extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules() {
+    move_rules(board,fieldArray) {
+        const currentField = board.children[this.row * 8 + this.column];
+        currentField.userData.legal = true;
+        currentField.material.emissive.set(0xff0000);
+
+        console.log(this.color);
+
+        const directions = [
+            { dr: -1, dc: 0 },  // up
+            { dr: 1, dc: 0 },   // down
+            { dr: 0, dc: -1 },  // left
+            { dr: 0, dc: 1 }    // right
+        ];
+
+        for (let dir of directions) {
+            let r = this.row + dir.dr;
+            let c = this.column + dir.dc;
+
+            while (r >= 0 && r < fieldArray.length && c >= 0 && c < fieldArray[r].length) {
+                const field = board.children[r*8+c];
+                if (field.userData.piece_on) {
+                    if (field.userData.piece.color === this.color) {
+                        field.userData.legal = false;
+                        break;
+                    } else {
+                        field.material.emissive.set(0xff0000);
+                        field.userData.legal = true;
+                        break;
+                    }
+                } else {
+                    field.material.emissive.set(0xff0000);
+                    field.userData.legal = true;
+                }
+                r += dir.dr;
+                c += dir.dc;
+            }
+        }
+
         return "Rook horizontally, or vertically any number of squares.";
     }
 }
 
 export class Bishop extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules() {
-        return "Bishop can move diagonally any number of squares.";
+    move_rules(board, fieldArray) {
+        const currentField = board.children[this.row * 8 + this.column];
+        currentField.userData.legal = true;
+        currentField.material.emissive.set(0xff0000);
+
+
+        const directions = [
+            { dr: -1, dc: -1 },  // up-left
+            { dr: -1, dc: 1 },   // up-right
+            { dr: 1, dc: -1 },   // down-left
+            { dr: 1, dc: 1 }     // down-right
+        ];
+
+        for (let dir of directions) {
+            let r = this.row + dir.dr;
+            let c = this.column + dir.dc;
+
+            while (r >= 0 && r < fieldArray.length && c >= 0 && c < fieldArray[r].length) {
+                const field = board.children[r * 8 + c];
+                if (field.userData.piece_on) {
+                    if (field.userData.piece.color === this.color) {
+                        field.userData.legal = false;
+                        break;
+                    } else {
+                        field.material.emissive.set(0xff0000);
+                        field.userData.legal = true;
+                        break;
+                    }
+                } else {
+                    field.material.emissive.set(0xff0000);
+                    field.userData.legal = true;
+                }
+                r += dir.dr;
+                c += dir.dc;
+            }
+        }
+
+        return "Bishop diagonally any number of squares.";
     }
 }
 
 
 export class Pawn extends Piece {
-    constructor(type, color, row, column) {
-        super(type, color, row, column);
+    constructor(type, color, row, column, mesh,fieldArray) {
+        super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules() {
-        return "Pawn can move only forward";
+    move_rules(board, fieldArray) {
+        const direction = this.color === "white" ? 1 : -1;
+        const startRow = this.color === "white" ? 1 : 6;
+
+        let fieldAhead = board.children[(this.row + direction) * 8 + this.column];
+        if (!fieldAhead.userData.piece_on) {
+            fieldAhead.material.emissive.set(0xff0000);
+            fieldAhead.userData.legal = true;
+
+            if (this.row === startRow) {
+                let secondFieldAhead = board.children[(this.row + 2 * direction) * 8 + this.column];
+                if (!secondFieldAhead.userData.piece_on) {
+                    secondFieldAhead.material.emissive.set(0xff0000);
+                    secondFieldAhead.userData.legal = true;
+                }
+            }
+        }
+
+        const diagonalDirections = [-1, 1];
+        for (let dc of diagonalDirections) {
+            let fieldDiagonal = board.children[(this.row + direction) * 8 + (this.column + dc)];
+            if (fieldDiagonal && fieldDiagonal.userData.piece_on && fieldDiagonal.userData.piece.color !== this.color) {
+                fieldDiagonal.material.emissive.set(0xff0000);
+                fieldDiagonal.userData.legal = true;
+            }
+        }
+
+        const currentField = board.children[this.row * 8 + this.column];
+        currentField.material.emissive.set(0xff0000);
+        currentField.userData.legal = true;
+
+        return "Pawn can move forward one square, optionally two if in its starting position, and capture diagonally.";
     }
 }
 
 
 
+export class Field{
+    constructor(row, column, material) {
+            this.type = "ground";
+            this.row = row;
+            this.column = column;
+            this.legal = false;
+            this.material = material
+            this.piece_on = false;
+            this.piece = null;
+        }
+
+
+}

@@ -3,25 +3,69 @@
 <head>
   <meta charset="utf-8">
   <title>Chess</title>
-  <style>
-    body { margin: 0; }
-  </style>
-	<script src="/socket.io/socket.io.js"></script>
-	<!-- <script src="lib/socket.io-1.2.0.js"></script>
-	<script src="lib/jquery-1.11.1.js"></script>  -->
-	<!-- <script src="server_client.js"></script> -->
-
+  <link rel="stylesheet" href="./chess_hud.css">
+  <script src="/socket.io/socket.io.js"></script>
   <script type="importmap">
-	{
-	  "imports": {
-		"three": "https://unpkg.com/three/build/three.module.js",
-		"three/addons/": "https://unpkg.com/three/examples/jsm/"
-	  }
-	}
+    {
+      "imports": {
+        "three": "https://unpkg.com/three/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three/examples/jsm/"
+      }
+    }
   </script>
-
 </head>
 <body>
-	<script type="module" src="/main.js"></script>
+  <div class="main-column">
+    <script type="module" src="/main.js"></script>
+     <div id="endGameBar" class="end-game-bar">
+        <div class="end-game-content">
+            <p id="endGameMessage">Partia zakończona!</p>
+            <button id="restartButton">Zagraj ponownie</button>
+<!--            <button id="closeButton">Zamknij</button>-->
+        </div>
+    </div>
+  </div>
+  <div class="overlay-column left">
+    <div class="profile-info">
+      <div class="Profile_photo">
+          <img class="Profile_photo-img" src="path/to/your/image.jpg" alt="Profile Photo">
+      </div>
+      <div class="Profile_name">Player-W</div>
+    </div>
+    <div class="clock-container">
+      <div class = clock  id = "White_clock">10:00</div>
+    </div>
+    <div class = points_pieces_container>
+      <div class = points_pieces id="White_Player">
+            <span id="White_Player_points"></span>
+      </div>
+    </div>
+    <div class="buttons-container">
+      <button id="White_resignButton">Poddaj</button>
+      <button id="White_drawButton">Remis</button>
+    </div>
+  </div>
+  <div class="overlay-column right">
+    <div class="profile-info">
+      <div class="Profile_photo">
+          <img class="Profile_photo-img" src="path/to/your/image.jpg" alt="Profile Photo">
+      </div>
+      <div class="Profile_name">Player-B</div>
+    </div>
+    <div class="clock-container">
+      <div class = clock id = "Black_clock">10:00</div>
+    </div>
+    <div class = points_pieces_container >
+      <div class = points_pieces id="Black_Player">
+        <span id="Black_Player_points"></span>
+      </div>
+    </div>
+    <div class="buttons-container">
+      <button id="Black_resignButton">Poddaj</button>
+      <button id="Black_drawButton">Remis</button>
+    </div>
+
+  </div>
+
 </body>
 </html>
