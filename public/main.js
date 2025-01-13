@@ -10,6 +10,8 @@ import  * as hud from './HUD.js'
 
 let board;
 
+// const client = io();
+
 
 class ChessScene {
     constructor() {
@@ -34,6 +36,7 @@ class ChessScene {
         };
         this.pointsBlack = 0;
         this.pointsWhite = 0;
+        // this.client = io();
         this.init_scene();
 
         this.init_event_listeners();  
@@ -282,6 +285,7 @@ class ChessScene {
                 {
                     this.draggable_obj = intersectedObject;
                     Animation.Piece_up(this.draggable_obj,this.is_Animating)
+                    //this.client.emit('moveUp', { data: intersectedObject.userData });
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
                     intersectedObject.userData.move_rules(this.board,this.fieldArray)
@@ -337,7 +341,7 @@ class ChessScene {
                         this.draggable_obj.userData.setPosition = obj.point.clone()
                     }
                     // var setPointPrime =obj.point.clone().sub( this.draggable_obj.position.clone());
-                    Animation.second_order_model(this.draggable_obj , this.params, 0.05,this.is_Animating);
+                   // Animation.second_order_model(this.draggable_obj , this.params, 0.05,this.is_Animating);
                     // this.draggable_obj.position.x = obj.point.x
                     // this.draggable_obj.position.z = obj.point.z
 
