@@ -166,7 +166,7 @@ class ChessScene {
         // console.log(this.board);
 
         // Uruchom zegar z początkowym czasem 10 minut
-        hud.ClockAnimation(600, 600, this);
+        
 
     }
 
@@ -184,6 +184,9 @@ class ChessScene {
         });
         document.getElementById('White_resignButton').addEventListener('click', () => {
             hud.endGame('black');
+        });
+        document.getElementById('Black_startButton').addEventListener('click', () => {
+            hud.ClockAnimation(600, 600, this);
         });
     }
 
@@ -219,6 +222,8 @@ class ChessScene {
                     this.turn = !this.turn;
                     this.draggable_obj.userData.row = row
                     this.draggable_obj.userData.column = col
+
+                    sendMove({ fromRow, fromCol, toRow: row, toCol: col });
                 }
 
                 if(this.fieldArray[row][col].piece != null && this.fieldArray[row][col].piece.color !== this.draggable_obj.userData.color)
