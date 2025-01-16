@@ -166,7 +166,7 @@ class ChessScene {
         // console.log(this.board);
 
         // Uruchom zegar z początkowym czasem 10 minut
-        
+        hud.ClockAnimation(600, 600, this);
 
     }
 
@@ -184,9 +184,6 @@ class ChessScene {
         });
         document.getElementById('White_resignButton').addEventListener('click', () => {
             hud.endGame('black');
-        });
-        document.getElementById('Black_startButton').addEventListener('click', () => {
-            hud.ClockAnimation(600, 600, this);
         });
     }
 
@@ -222,8 +219,6 @@ class ChessScene {
                     this.turn = !this.turn;
                     this.draggable_obj.userData.row = row
                     this.draggable_obj.userData.column = col
-
-                    sendMove({ fromRow, fromCol, toRow: row, toCol: col });
                 }
 
                 if(this.fieldArray[row][col].piece != null && this.fieldArray[row][col].piece.color !== this.draggable_obj.userData.color)
@@ -263,6 +258,8 @@ class ChessScene {
 
                 this.clear_board();
                 this.change_emission(this.draggable_obj);
+                console.log("koniec")
+                Animation.Piece_down(this.draggable_obj, this.is_Animating)
                 this.draggable_obj = null;
                 return;
             }
@@ -284,6 +281,7 @@ class ChessScene {
                     (!this.turn && intersectedObject.userData.color === "black"))
                 {
                     this.draggable_obj = intersectedObject;
+                    Animation.Piece_up(this.draggable_obj,this.is_Animating)
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
                     intersectedObject.userData.move_rules(this.board,this.fieldArray)
@@ -301,6 +299,28 @@ class ChessScene {
     handle_mouse_move(event) {
         this.move_mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         this.move_mouse.y = - (event.clientY / window.innerHeight) * 2 + 1;
+        // const intersects = this.raycaster.intersectObjects(this.scene.children);
+
+        // if (intersects.length > 0) {
+        //     const intersectedObject = intersects[0].object;
+
+        //     // If it's a valid object and the object has been hovered previously
+        //     if (this.lastHoveredObject && this.lastHoveredObject !== intersectedObject) {
+        //         // Reset the emissive color of the previously hovered object
+                
+        //     }
+
+        //     // Change the color of the currently hovered object
+        //     intersectedObject.material.emissive.set(0xff0000);
+
+        //     // Update the last hovered object
+        //     this.lastHoveredObject = intersectedObject;
+        // } else {
+        //     // If nothing is intersected, reset the emissive color of the last hovered object
+        //     if (this.lastHoveredObject) {
+        //         this.lastHoveredObject.material.emissive.set(0x000000);
+        //     }
+        // }
 
     }
 
@@ -358,12 +378,8 @@ class ChessScene {
         const new_value = ((value - min_old) / (max_old - min_old)) * (max_new - min_new) + min_new;
         return Math.round(new_value);
     }
-
-
-
-
 }
 
-export const chess_scene = new ChessScene();
+const chess_scene = new ChessScene();
 
 // initScene();

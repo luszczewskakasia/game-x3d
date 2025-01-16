@@ -14,6 +14,7 @@
   "version": "1.0.0",
   "description": "1. Clone whole repo\r 2. Install node.js \r 3. From command line, in game-x3d directory run server using command:\r ```\r node index.js\r ```\r 4. Open website http://localhost:8080/",
   "main": "index.js",
+  "type": "module",
   "directories": {
     "lib": "lib"
   },

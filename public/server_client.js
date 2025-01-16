@@ -9,6 +9,18 @@ if (username == null){
 //client socket - połączenie z klienta na serwer
 client_socket.emit('username', username);
 
+<<<<<<< HEAD
+client_socket.on('moveUp', Animation.Piece_up);
+client_socket.on('moveDown', Animation.Piece_down);
+
+// socket.on('role', (role) => {
+//     if (role == 'player'){
+//         console.log(username + 'is a player');
+//     } else if (role == 'observer'){
+//         console.log(username + 'is observer');
+//     }
+// });
+=======
 client_socket.on('role', (role) => {
     if (role == 'player1') {
         document.querySelector('.overlay-column.left .Profile_name').textContent = username;
@@ -28,3 +40,4 @@ client_socket.on('updatePlayers', (players) => {
       document.querySelector('.overlay-column.right .Profile_name').textContent = players[1];
     }
 });
+>>>>>>> 11c4d3b (players name displays)

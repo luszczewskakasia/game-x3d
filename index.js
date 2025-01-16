@@ -1,11 +1,17 @@
-const express = require('express');
-const { createServer } = require('node:http');
-const { join } = require('node:path');
-const { Server } = require('socket.io');
+import express from 'express';
+import { createServer } from 'node:http';
+import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { Server } from 'socket.io';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = join(__filename, '..');
+
+// import { Animation } from './public/animation.js';
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server)
+const io = new Server(server);
 
 let players = [];
 let observer = [];
@@ -13,44 +19,63 @@ let observer = [];
 app.use(express.static(join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
-  res.sendFile(join(__dirname, '/public/index.html'));
+  res.sendFile(join(__dirname, 'public/index.html'));
 });
+
 
 // słucha sobie połączeń między klientami na serwer
 io.on('connection', (socket) => {
   let username = null;
-  // czeka na dostanie imienia które jest emitowane od tego klienta (socket)
-  // połączenie  do konkretnego klienta z serwera hosta
-  // instancja do konkretnego klienta
+
+  // Handle the username registration
   socket.on('username', (name) => {
+<<<<<<< HEAD
     username = name;
     if (players.length >= 2){
-        observer.push(username);
-        socket.emit('role', 'observer');
-        console.log('Obserwator ', username, ' dołączył do gry');
-    } else if (players.length === 1) {
-        players.push(username);
-        socket.emit('role', 'player2');
-        console.log('Gracz ', username, ' dołączył do gry')
+      observer.push(username);
+      socket.emit('role', 'observer');
+      console.log('Observer ', username, ' joined the game');
     } else {
-        players.push(username);
-        socket.emit('role', 'player1');
-        console.log('Gracz ', username, ' dołączył do gry')
+      players.push(username);
+      socket.emit('role','player');
+      console.log('Player ', username, ' joined the game')
     }
+  
+    });
+    
+    socket.on('moveUp', () => {
+      console.log('moveUp');
+      socket.broadcast.emit('moveUp');
+    }); 
 
-    io.emit('updatePlayers', players);
-
-    // socket.on('move', (moveData) => {
-    //   // Emitowanie ruchu do wszystkich innych klientów
-    //   socket.broadcast.emit('move', moveData);
-    // });
-    socket.on('move', (moveData) => {
-      // Broadcast the move to all other clients
-      socket.broadcast.emit('move', moveData);
+    socket.on('moveDown', () => {
+      console.log('moveDown');
+      socket.broadcast.emit('moveDown');
     });
 
+  })
+=======
+      username = name;
+      if (players.length >= 2) {
+          observer.push(username);
+          socket.emit('role', 'observer');
+          console.log('Obserwator ', username, ' dołączył do gry');
+      } else if (players.length === 1) {
+          players.push(username);
+          socket.emit('role', 'player2');
+          console.log('Gracz ', username, ' dołączył do gry');
+      } else {
+          players.push(username);
+          socket.emit('role', 'player1');
+          console.log('Gracz ', username, ' dołączył do gry');
+      }
+
+      io.emit('updatePlayers', players);
   });
-})
+});
+
+>>>>>>> 11c4d3b (players name displays)
+
 
 server.listen(5000, () => {
   console.log('server running at http://localhost:5000');
