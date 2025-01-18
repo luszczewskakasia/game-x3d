@@ -1,32 +1,10 @@
 import * as THREE from 'three';
 
+let test_client = io();
 export class Animation {
     constructor() {
         this.startTime = 10000;
-    }
-
-    static bounce(object, amplitude, frequency, damping, starting_position) {
-        const animate = (time) => {
-            requestAnimationFrame(animate);
-            if (!this.startTime) {
-                this.startTime = time;
-            } 
-
-            const elapsed = (time - this.startTime) / 1000;
-
-            const current_amplitude = amplitude * Math.exp(-damping * elapsed);
-
-            if (current_amplitude < 0.05) {
-                object.position.y = starting_position;
-                return;
-            }
-
-            object.position.y = starting_position + current_amplitude * Math.sin(2 * Math.PI * frequency * elapsed);
-
-            
-        };
-
-        requestAnimationFrame(animate);
+        this.gameState = null;
     }
 
     static second_order_model(object, params, deltaTime, is_Animating) {
@@ -81,10 +59,26 @@ export class Animation {
         }
     }
 
-    static Piece_up(object, is_Animating) {
+    static Piece_up(object, is_Animating, gameState) {
+        if (this.gameState = null) {
+            console.log(this.gameState);
+        }
+
+        this.gameState = gameState;
         const animation_duration = 1.0;
         const starting_position = 0.5;
         const target_position = 2.4;
+        console.log(this.gameState.fieldArray[1][1]);
+        // setInterval(() => {
+        //     if (this.gameState.fieldArray[1][1].piece_on) {
+        //         test_client.emit('update_game_state', this.gameState);
+        //         console.log('Wysłano stan gry:', this.gameState);
+        //     }
+        //     else {
+        //         test_client.emit('update_game_state', this.gameState);
+        //         console.log('Nie wysłano stanu gry:', this.gameState);
+        //     }
+        // }, 300);
         const animate_up = (time) => {
             is_Animating = true;
             requestAnimationFrame(animate_up);
@@ -100,9 +94,13 @@ export class Animation {
             }
             const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3); // Ease-out
             object.position.y = starting_position + (target_position - starting_position) * easing_factor;
+ 
+
 
             requestAnimationFrame(() => animate_up);
         }
+
+
         requestAnimationFrame(animate_up);
     }
 
