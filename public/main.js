@@ -21,6 +21,8 @@ class ChessScene {
         this.click_mouse = new THREE.Vector2();
         this.move_mouse = new THREE.Vector2();
         this.draggable_obj = null;
+        // this.whiteKing = {row: 0, column: 3};
+        // this.blackKing = {row: 7, column: 3};
         this.is_draggable = false;
         this.board = null;
         this.loaded_scene = false;
@@ -259,6 +261,16 @@ class ChessScene {
                             this.board.remove(Mesh);
                         }
                     }
+                    // if (piece.piece == "king"){
+                    //     switch (piece.color) {
+                    //         case "white":
+                    //             this.whiteKing = {row, col}
+                    //             break;
+                    //         case "black":
+                    //             this.blackKing = {row, col}
+                    //             break;
+                    //     }
+                    // }
                 }
                 this.fieldArray[row][col].piece_on = true;
                 this.fieldArray[row][col].piece = this.draggable_obj.userData

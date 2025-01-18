@@ -115,7 +115,7 @@ export class Animation {
         const animate_down = (time) => {
             is_Animating = true;
             requestAnimationFrame(animate_down);
-            console.log(object)
+            //console.log(object)
             if (!this.startTime) {
                 this.startTime = time;
             }
@@ -124,7 +124,7 @@ export class Animation {
             if (elapsed >= animation_duration) {
                 object.position.y = target_position;
                 is_Animating = false;
-                console.log(object)
+                //console.log(object)
                 return;
             }
             const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3); // Ease-out
