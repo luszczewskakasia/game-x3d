@@ -200,7 +200,8 @@ class ChessScene {
         document.getElementById('White_resignButton').addEventListener('click', () => {
             hud.endGame('black');
         });
-        document.getElementById("Black_startButton").addEventListener('click', () => {
+        document.getElementById("startGameButton").addEventListener('click', () => {
+            document.getElementById("startScreen").style.display = 'none';
             hud.ClockAnimation(600,600,this);
         });
     }
