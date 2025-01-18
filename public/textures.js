@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.135.0/examples/jsm/loaders/OBJLoader.js';
 
 
 const textureLoader = new THREE.TextureLoader();
@@ -165,3 +166,38 @@ export const yellow = () => new THREE.MeshStandardMaterial({
     metalness: 0.5,          // Metaliczność (opcjonalnie)
     roughness: 1.0           // Chropowatość (opcjonalnie)
 });
+
+
+export const createChessboard_Marble = () => new THREE.MeshStandardMaterial({
+    map: textureLoader.load('Textures_chessboard/Chessboard_Marble.png'),
+    metalness: White_metalness,
+    roughness: White_roughness
+});
+
+export const createChessboard_Gold = () => new THREE.MeshStandardMaterial({
+    map: textureLoader.load('Textures_chessboard/Chessboard_Gold.png'),
+    metalness: 0.9,
+    roughness: 0.4
+});
+
+
+export const create_chessboard_mesh = () => {
+    const loader = new OBJLoader();
+    const Model3D = "./szachownica.obj";
+     return loader.loadAsync(Model3D).then((group) => {
+
+        const chessboard = group.children[0]
+
+        chessboard.scale.set(0.5, 0.5, 0.5);
+        chessboard.position.set(0, 0.5, 0);
+        chessboard.castShadow = true;
+        chessboard.receiveShadow = true;
+        chessboard.traverse(function (child) {
+            if (child.isMesh) {
+                 child.material[0] = createChessboard_Marble();
+                 child.material[1] = createChessboard_Gold();
+            }
+        });
+        return chessboard;
+    });
+}

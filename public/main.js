@@ -96,14 +96,19 @@ class ChessScene {
     }
 
     create_chessboard() {
-        const background_geo = new THREE.BoxGeometry(9, 1, 9);
-        const background_material = new THREE.MeshBasicMaterial({ color: 0x964B00 });
-        const background_cube = new THREE.Mesh(background_geo, background_material);
-        this.scene.add(background_cube);
+    //     const background_geo = new THREE.BoxGeometry(9, 1, 9);
+    //     const background_material = new THREE.MeshBasicMaterial({ color: 0x964B00 });
+    //     const background_cube = new THREE.Mesh(background_geo, background_material);
+    //     this.scene.add(background_cube);
+        tex.create_chessboard_mesh().then((chessboard) => {
+            console.log(chessboard)
+            this.scene.add(chessboard);
+        })
+        this.scene.add(tex.create_chessboard_mesh())
         const square_size = 1;
         const rows = 8;
         const cols = 8;
-        const square_geo = new THREE.BoxGeometry(square_size, 0.1, square_size);
+        const square_geo = new THREE.BoxGeometry(square_size-0.04, 0.1, square_size-0.04);
         this.board = new THREE.Group();
 
 
@@ -221,9 +226,6 @@ class ChessScene {
             if(this.fieldArray[row][col].legal && (this.fieldArray[row][col].piece == null ||
                 this.fieldArray[row][col].piece.color !== this.draggable_obj.userData.color))
             {
-
-                // console.log(this.draggable_obj.userData);
-                // console.log(this.fieldArray[row][col].piece);
                 if(this.draggable_obj.userData.row !== row || this.draggable_obj.userData.column !== col)
                 {
                     this.turn = !this.turn;
@@ -246,16 +248,12 @@ class ChessScene {
                             }
                             hud.addCapturedPiece(piece.color, piece.type,this)
                             this.board.remove(Mesh);
-                        }).catch(error => {
-                        });
+                        })
                     } else {
                         const Mesh = piece.mesh;
                         if (Mesh) {
                             hud.addCapturedPiece(piece.color, piece.type,this)
                             this.board.remove(Mesh);
-                            // console.log(`Removed mesh from row ${row}, col ${col}`);
-                        } else {
-                            // console.error(`Mesh is undefined in piece at row ${row}, col ${col}`);
                         }
                     }
                 }

@@ -228,5 +228,53 @@ def split_textures(Piec_type):
     B_M3_nor_img.save(Path_Material_3_Black_normal)
     B_M3_displ_img.save(Path_Material_3_Black_displace)
 
+def split_chessboard():
 
-split_textures("horse")
+    Path_material1_mask = f'tex1_mask.png'
+    Path_material2_mask = f'tex2_mask.png'
+    Mask1 = Image.open(Path_material1_mask).convert('RGBA')
+    Mask2 = Image.open(Path_material2_mask).convert('RGBA')
+    pixels_Mask1 = Mask1.load()
+    pixels_Mask2 = Mask2.load()
+
+    Path_glossy = f'chessboard_glossy.png'
+    Glossy = Image.open(Path_glossy).convert('RGBA')
+    pixels_Glossy = Glossy.load()
+
+    Path_diffuse = f'chessboard_diffuse.png'
+    diffuse = Image.open(Path_diffuse).convert('RGBA')
+    pixels_diffuse = diffuse.load()
+
+    width, height = diffuse.size
+
+    Marble_diff_img = Image.new('RGBA', (width, height))
+    Gold_diff_img = Image.new('RGBA', (width, height))
+    Marble_diff = Marble_diff_img.load()
+    Gold_diff = Gold_diff_img.load()
+
+    for y in range(width):
+        for x in range(height):
+            Mask1_r, Mask1_g, Mask1_b, Mask1_a = pixels_Mask1[x, y]
+            Mask2_r, Mask2_g, Mask2_b, Mask2_a = pixels_Mask2[x, y]
+
+            if Mask1_r > 240 and Mask1_g > 240 and Mask1_b > 240:
+                Marble_diff[x, y] = pixels_diffuse[x, y]
+            else:
+                Marble_diff[x, y] = (0, 0, 0, 0)
+
+
+            if Mask2_r > 240 and Mask2_g > 240 and Mask2_b > 240:
+                Gold_diff[x, y] = pixels_Glossy[x, y]
+            else:
+                Gold_diff[x, y] = (0, 0, 0, 0)
+
+
+    Marble_diff_path = f'Chessboard_Marble.png'
+    Gold_diff_path = f'Chessboard_gold.png'
+
+    Marble_diff_img.save(Marble_diff_path)
+    Gold_diff_img.save(Gold_diff_path)
+
+
+# split_textures("horse")
+split_chessboard()
