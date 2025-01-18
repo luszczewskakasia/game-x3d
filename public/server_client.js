@@ -1,4 +1,4 @@
-import { is_Animating } from './animation.js';
+import { Animation } from './animation.js';
 
 const client = io();
 
@@ -6,6 +6,8 @@ let username = null;
 if (username == null){
     username = prompt("Wpisz nazwę użytkownika");
 }
+
+let anim = new Animation();
 
 //to wysyla wiadomosci na serwer hostas
 //client socket - połączenie z klienta na serwer
@@ -38,12 +40,12 @@ gameState = {
 }
 
 setInterval(() => {
-    if (gameState.isAnimating) {
+    if (anim.Pie) {
         client.emit('update_game_state', gameState);
         console.log('Wysłano stan gry:', gameState);
     }
     else {
-        // client.emit('update_game_state', gameState);
+        client.emit('update_game_state', gameState);
         console.log('Nie wysłano stanu gry:', gameState);
     }
 }, 100);
