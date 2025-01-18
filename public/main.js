@@ -246,6 +246,7 @@ class ChessScene {
                         piece.then(piece => {
                             if (!piece) {
                                 return;
+
                             }
                             const Mesh = piece.mesh;
                             if (!Mesh) {

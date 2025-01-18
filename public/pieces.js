@@ -226,6 +226,7 @@ export class King extends Piece {
 
         // Directions in which the king can move
         const directions = [
+            { dr: 0, dc: 0 },   // stay
             { dr: -1, dc: 0 },   // up
             { dr: 1, dc: 0 },    // down
             { dr: 0, dc: -1 },   // left
@@ -238,54 +239,35 @@ export class King extends Piece {
 
         const opponentColor = this.color === "white" ? "black" : "white";
         const opponentMoves = new Set();
-
         for (let row = 0; row < 8; row++) {
             for (let column = 0; column < 8; column++) {
 
-                var piece = fieldArray[row][column].piece;
+                let piece = fieldArray[row][column].piece;
 
                 if (piece instanceof Promise) {
                     piece.then((resolvedPiece) => {
                         piece = resolvedPiece;
-                    }).catch((error) => {
-                        console.error("Error resolving piece promise:", error);
-                    });
-                }
-
-                console.log(piece);
-
-                const field = fieldArray[row][column];
-                if (field.piece) {
-                    const piece = field.piece;
-                    if (piece.color === opponentColor && piece.type !== "king") {
-                        console.log(piece);
-                        const moves = piece.move_rules(board, fieldArray);
-                        moves.forEach(move => {
-                            opponentMoves.add(move.row * 8 + move.column);
-                        });
+                        // tu należy uzupełnić obsługę Promise
 
 
-                    }
+                    })
                 }
             }
         }
-
         for (let dir of directions) {
             const r = this.row + dir.dr;
             const c = this.column + dir.dc;
-
             if (r >= 0 && r < 8 && c >= 0 && c < 8) {
-                const field = board.children[r * 8 + c];
-
+                const field = fieldArray[r][c];
                 if (!opponentMoves.has(r * 8 + c)) {
-                    if (field.userData.piece_on) {
-                        if (field.userData.piece.color !== this.color) {
-                            field.userData.legal = true;
+                    if (field.piece_on) {
+                        if (field.piece.color !== this.color) {
+                            field.legal = true;
                             field.material.emissive.set(0xff0000);
                             legalMoves.push(field);
                         }
                     } else {
-                        field.userData.legal = true;
+                        field.legal = true;
                         field.material.emissive.set(0xff0000);
                         legalMoves.push(field);
                     }
