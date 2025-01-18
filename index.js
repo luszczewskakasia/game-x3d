@@ -7,8 +7,6 @@ import { Server } from 'socket.io';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = join(__filename, '..');
 
-import { Animation } from './public/animation.js';
-
 const app = express();
 const server = createServer(app);
 const io = new Server(server);
@@ -22,7 +20,6 @@ app.use(express.static(join(__dirname, 'public')));
 app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'public/index.html'));
 });
-
 
 // słucha sobie połączeń między klientami na serwer
 io.on('connection', (socket) => {
@@ -48,17 +45,14 @@ io.on('connection', (socket) => {
     }
 
     io.emit('updatePlayers', players);
-
-    // socket.on('move', (moveData) => {
-    //   // Emitowanie ruchu do wszystkich innych klientów
-    //   socket.broadcast.emit('move', moveData);
-    // });
-    socket.on('move', (moveData) => {
-      // Broadcast the move to all other clients
-      socket.broadcast.emit('move', moveData);
-    });
-
   });
+
+  socket.on('update_game_state', (gameState) => {
+    console.log('Otrzymano stan gry od klienta:', gameState);
+
+    // Rozsyłanie zaktualizowanego stanu do innych klientów
+    socket.broadcast.emit('broadcast_game_state', gameState);
+    });
 
 //   socket.on('moveUp', (data) => {
 //     if (players[currentPlayerIndex] === username) {

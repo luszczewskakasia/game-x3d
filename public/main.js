@@ -10,7 +10,6 @@ import  * as hud from './HUD.js'
 
 let board;
 
-
 class ChessScene {
     constructor() {
         this.scene = new THREE.Scene();
@@ -101,7 +100,7 @@ class ChessScene {
     //     const background_cube = new THREE.Mesh(background_geo, background_material);
     //     this.scene.add(background_cube);
         tex.create_chessboard_mesh().then((chessboard) => {
-            console.log(chessboard)
+            // console.log(chessboard)
             this.scene.add(chessboard);
         })
         this.scene.add(tex.create_chessboard_mesh())
@@ -293,7 +292,7 @@ class ChessScene {
                     (!this.turn && intersectedObject.userData.color === "black"))
                 {
                     this.draggable_obj = intersectedObject;
-                    Animation.Piece_up(this.draggable_obj,this.is_Animating)
+                    Animation.Piece_up(this.draggable_obj,this.is_Animating, this);
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
                     intersectedObject.userData.move_rules(this.board,this.fieldArray)

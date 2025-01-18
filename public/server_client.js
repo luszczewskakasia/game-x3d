@@ -1,8 +1,6 @@
-// import { Animation } from './animation.js';
+import { is_Animating } from './animation.js';
 
 const client = io();
-
-const chessScene = new ChessScene(client);
 
 let username = null;
 if (username == null){
@@ -35,13 +33,31 @@ client.on('updatePlayers', (players) => {
     }
 });
 
+gameState = {
+    is_Animating: false
+}
 
-client.on('moveUp', (data) => {
-    console.log('Opponent moved piece up:', data);
-    Animation.Piece_up(object, false);
+setInterval(() => {
+    if (gameState.isAnimating) {
+        client.emit('update_game_state', gameState);
+        console.log('Wysłano stan gry:', gameState);
+    }
+    else {
+        // client.emit('update_game_state', gameState);
+        console.log('Nie wysłano stanu gry:', gameState);
+    }
+}, 100);
+
+client.on('broadcast_game_state', (updatedGameState) => {
+    console.log('Otrzymano stan gry od serwera:', updatedGameState);
 });
 
-client.on('moveDown', (data) => {
-    console.log('Opponent moved piece down:', data);
-    Animation.Piece_down(object, false);
-});
+
+
+// client.on('moveUp', (data) => {
+//     Animation.Piece_up(object, false);
+// });
+
+// client.on('moveDown', (data) => {
+//     Animation.Piece_down(object, false);
+// });
