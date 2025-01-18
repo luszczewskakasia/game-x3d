@@ -221,10 +221,8 @@ export class King extends Piece {
         super(type, color, row, column, mesh, fieldArray);
     }
 
-    move_rules(board, fieldArray) {
+    async move_rules(board, fieldArray) {
         const legalMoves = [];
-
-        // Directions in which the king can move
         const directions = [
             { dr: 0, dc: 0 },   // stay
             { dr: -1, dc: 0 },   // up
@@ -239,37 +237,59 @@ export class King extends Piece {
 
         const opponentColor = this.color === "white" ? "black" : "white";
         const opponentMoves = new Set();
+
         for (let row = 0; row < 8; row++) {
             for (let column = 0; column < 8; column++) {
-
                 let piece = fieldArray[row][column].piece;
 
                 if (piece instanceof Promise) {
-                    piece.then((resolvedPiece) => {
-                        piece = resolvedPiece;
-                        // tu należy uzupełnić obsługę Promise
+                    piece = await piece;
+                }
 
-
-                    })
+                if (piece && piece.color === opponentColor && piece.type !== "king") {
+                    const moves = piece.move_rules(board, fieldArray);
+                    moves.forEach(move => opponentMoves.add(move.userData.row * 8 + move.userData.column));
                 }
             }
         }
-        for (let dir of directions) {
-            const r = this.row + dir.dr;
-            const c = this.column + dir.dc;
-            if (r >= 0 && r < 8 && c >= 0 && c < 8) {
-                const field = fieldArray[r][c];
-                if (!opponentMoves.has(r * 8 + c)) {
-                    if (field.piece_on) {
-                        if (field.piece.color !== this.color) {
-                            field.legal = true;
+
+        console.log(opponentMoves);
+
+        for (let i = 0; i < board.children.length; i++) {
+            if (board.children[i].type === "Field") {
+                const field = board.children[i];
+                const targetRow = field.userData.row;
+                const targetColumn = field.userData.column;
+                const fieldKey = targetRow * 8 + targetColumn;
+
+                console.log("numer ", fieldKey, " ?: ", opponentMoves.has(fieldKey));
+
+                field.userData.legal = false;
+                field.material.emissive.set(0x000000);
+
+                if (targetRow === this.row && targetColumn === this.column) {
+                    field.userData.legal = true;
+                    field.material.emissive.set(0xff0000);
+                    legalMoves.push(field);
+                    continue;
+                }
+
+                const rowDiff = Math.abs(targetRow - this.row);
+                const colDiff = Math.abs(targetColumn - this.column);
+
+                if (rowDiff <= 1 && colDiff <= 1) {
+                    if (!opponentMoves.has(fieldKey)) {
+                        if (field.userData.piece_on) {
+                            if (field.userData.piece.color !== this.color) {
+                                field.userData.legal = true;
+                                field.material.emissive.set(0xff0000);
+                                legalMoves.push(field);
+                            }
+                        } else {
+                            field.userData.legal = true;
                             field.material.emissive.set(0xff0000);
                             legalMoves.push(field);
                         }
-                    } else {
-                        field.legal = true;
-                        field.material.emissive.set(0xff0000);
-                        legalMoves.push(field);
                     }
                 }
             }
@@ -394,7 +414,6 @@ export class Bishop extends Piece {
         const legalMoves = [];
         const currentField = board.children[this.row * 8 + this.column];
         currentField.userData.legal = true;
-        legalMoves.push(field);
         currentField.material.emissive.set(0xff0000);
 
 
