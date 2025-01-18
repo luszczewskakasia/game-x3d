@@ -35,9 +35,7 @@ client.on('updatePlayers', (players) => {
     }
 });
 
-gameState = {
-    is_Animating: false
-}
+
 
 setInterval(() => {
     if (anim.Pie) {

@@ -3,7 +3,7 @@ import { OBJLoader } from 'https://cdn.jsdelivr.net/npm/three@0.135.0/examples/j
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import * as tex from './textures.js';
 import * as pieces from './pieces.js';
-import { Animation } from './animation.js';
+import {Animation, Clients} from './animation.js';
 import  * as hud from './HUD.js'
 
 // import scene from "three/examples/jsm/offscreen/scene";
@@ -33,6 +33,8 @@ class ChessScene {
             frequency: 0.4,
             response_factor: 0
         };
+        this.clients = new Clients()
+
         this.pointsBlack = 0;
         this.pointsWhite = 0;
 
@@ -41,7 +43,8 @@ class ChessScene {
         this.init_event_listeners();  
     }
 
-    init_scene() {
+    init_scene()
+    {
         this.create_lightning();
         this.create_chessboard();
         this.renderer.setAnimationLoop(() => this.animate());
@@ -176,7 +179,6 @@ class ChessScene {
 
     }
 
-
     animate() {
         this.drag_object(); 
         if (this.loaded_scene) {
@@ -205,6 +207,7 @@ class ChessScene {
             document.getElementById("startScreen").style.display = 'none';
             hud.ClockAnimation(600,600,this);
         });
+
     }
 
     handle_mouse_click(event) {
@@ -283,7 +286,7 @@ class ChessScene {
                 this.clear_board();
                 this.change_emission(this.draggable_obj);
                 console.log("koniec")
-                Animation.Piece_down(this.draggable_obj, this.is_Animating)
+                Animation.Piece_down(this.draggable_obj, this.is_Animating,this)
                 this.draggable_obj = null;
                 return;
             }
@@ -360,8 +363,7 @@ class ChessScene {
         }
     }
 
-    clear_board()
-    {
+    clear_board() {
         for (let i = 0; i < this.fieldArray.length; i++) {
              for (let j = 0; j < this.fieldArray[i].length; j++)
              {

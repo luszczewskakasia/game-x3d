@@ -1,6 +1,65 @@
 import * as THREE from 'three';
 
-const test_client = io();
+
+export class Clients {
+    constructor() {
+
+        this.client = io();
+
+        this.last_choosen = {row : null , col : null};
+        this.new_field = {row : null , col : null};
+        this.name = ""
+        this.color = null;
+        let username = null;
+        if (username == null){
+            username = prompt("Wpisz nazwę użytkownika");
+        }
+        this.client.emit('username', username);
+
+        this.client.on('role', (role) => {
+            if (role == 'player1') {
+                document.querySelector('.overlay-column.left .Profile_name').textContent = username;
+            } else if (role == 'player2') {
+                document.querySelector('.overlay-column.right .Profile_name').textContent = username;
+            } else {
+                console.log('Obserwator');
+            }
+        });
+
+        this.client.on('updatePlayers', (players) => {
+            // Aktualizacja nazw graczy w UI
+            if (players[0]) {
+              document.querySelector('.overlay-column.left .Profile_name').textContent = players[0];
+            }
+            if (players[1]) {
+              document.querySelector('.overlay-column.right .Profile_name').textContent = players[1];
+            }
+        });
+
+        this.client.on('broadcast_state_up', (gameState) => {
+            this.last_choosen = gameState
+            console.log('Nowy stan:', gameState.row , gameState.col);
+        });
+
+        this.client.on('broadcast_state_down', (gameState) => {
+            this.new_field = gameState
+            console.log('Nowy stan:', gameState.row , gameState.col);
+        });
+
+        this.client.on('broadcast_new_client', (new_player) => {
+            this.name = new_player.name
+            this.color = new_player.id === 1 ? "white":"black";
+
+            console.log('Nowy stan:',  new_player.id);
+        });
+
+    }
+}
+
+
+
+
+
 export class Animation {
     constructor() {
         this.startTime = 10000;
@@ -68,7 +127,7 @@ export class Animation {
         const animation_duration = 1.0;
         const starting_position = 0.5;
         const target_position = 2.4;
-        test_client.emit('UPdate_game_state',{ row: object.userData.row, col: object.userData.column });
+        gameState.clients.client.emit('UPdate_game_state',{ row: object.userData.row, col: object.userData.column });
         console.log('Podniesion', object.userData.row , object.userData.column);
 
         const animate_up = (time) => {
@@ -97,12 +156,12 @@ export class Animation {
     }
 
 
-    static Piece_down(object, is_Animating)
+    static Piece_down(object, is_Animating, gameState)
     {
         const animation_duration = 1.0;
         const starting_position = 3.0;
         const target_position = 0.5;
-        test_client.emit('DOWNdate_game_state', { row: object.userData.row, col: object.userData.column });
+        gameState.clients.client.emit('DOWNdate_game_state', { row: object.userData.row, col: object.userData.column });
         console.log('Upadł', object.userData.row , object.userData.column);
 
         const animate_down = (time) => {
