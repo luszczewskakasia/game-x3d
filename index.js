@@ -47,8 +47,15 @@ io.on('connection', (socket) => {
     io.emit('updatePlayers', players);
   });
 
-  socket.on('update_game_state', (gameState) => {
-    console.log('Otrzymano stan gry od klienta:', gameState);
+  socket.on('UPdate_game_state', (gameState) => {
+    console.log('Podniesion:', gameState.row,gameState.col );
+
+    // Rozsyłanie zaktualizowanego stanu do innych klientów
+    socket.broadcast.emit('broadcast_game_state', gameState);
+    });
+
+    socket.on('DOWNdate_game_state', (gameState) => {
+    console.log('Upadł:', gameState.row,gameState.col );
 
     // Rozsyłanie zaktualizowanego stanu do innych klientów
     socket.broadcast.emit('broadcast_game_state', gameState);

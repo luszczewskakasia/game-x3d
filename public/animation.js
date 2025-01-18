@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 
-let test_client = io();
+const test_client = io();
 export class Animation {
     constructor() {
         this.startTime = 10000;
@@ -68,17 +68,9 @@ export class Animation {
         const animation_duration = 1.0;
         const starting_position = 0.5;
         const target_position = 2.4;
-        console.log(this.gameState.fieldArray[1][1]);
-        // setInterval(() => {
-        //     if (this.gameState.fieldArray[1][1].piece_on) {
-        //         test_client.emit('update_game_state', this.gameState);
-        //         console.log('Wysłano stan gry:', this.gameState);
-        //     }
-        //     else {
-        //         test_client.emit('update_game_state', this.gameState);
-        //         console.log('Nie wysłano stanu gry:', this.gameState);
-        //     }
-        // }, 300);
+        test_client.emit('UPdate_game_state',{ row: object.userData.row, col: object.userData.column });
+        console.log('Podniesion', object.userData.row , object.userData.column);
+
         const animate_up = (time) => {
             is_Animating = true;
             requestAnimationFrame(animate_up);
@@ -110,6 +102,9 @@ export class Animation {
         const animation_duration = 1.0;
         const starting_position = 3.0;
         const target_position = 0.5;
+        test_client.emit('DOWNdate_game_state', { row: object.userData.row, col: object.userData.column });
+        console.log('Upadł', object.userData.row , object.userData.column);
+
         const animate_down = (time) => {
             is_Animating = true;
             requestAnimationFrame(animate_down);
