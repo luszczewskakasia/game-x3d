@@ -44,9 +44,13 @@ io.on('connection', (socket) => {
         console.log('Gracz ', username, ' dołączył do gry')
     }
 
-
     io.emit('updatePlayers', players);
-  });
+    });
+
+    if (players.length === 2) {
+        socket.broadcast.emit('second_player_joined');
+        console.log('Dowiezion');
+    }
 
     socket.on('UPdate_game_state', (gameState) => {
     console.log('Podniesion:', gameState.row,gameState.col );

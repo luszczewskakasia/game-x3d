@@ -18,16 +18,21 @@ export class Clients {
 
         this.client.on('role', (role) => {
             if (role == 'player1') {
+                // document.getElementById('game-message').innerText = data.message;
                 document.querySelector('.overlay-column.left .Profile_name').textContent = username;
+
             } else if (role == 'player2') {
-                document.querySelector('.overlay-column.right .Profile_name').textContent = username;
+                document.getElementById("wait-container").style.display = 'none';
             } else {
                 console.log('Obserwator');
             }
         });
 
+        this.client.on('second_player_joined', () => {
+            console.log("Mamy to");
+            document.getElementById("wait-container").style.display = 'none';});
+
         this.client.on('updatePlayers', (players) => {
-            // Aktualizacja nazw graczy w UI
             if (players[0]) {
               document.querySelector('.overlay-column.left .Profile_name').textContent = players[0];
             }
