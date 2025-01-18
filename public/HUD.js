@@ -83,7 +83,8 @@ export const ClockAnimation = (timeRemainingBlack, timeRemainingWhite,chess_scen
 
         if (timeRemainingBlack <= 0) {
             document.getElementById('Black_clock').innerText = "00:00";
-            alert("Black clock time's up!");
+            endGame('white');
+            // window.location.reload();
             return;
         }
 
@@ -96,7 +97,8 @@ export const ClockAnimation = (timeRemainingBlack, timeRemainingWhite,chess_scen
 
         if (timeRemainingWhite <= 0) {
             document.getElementById('White_clock').innerText = "00:00";
-            alert("White clock time's up!");
+            endGame('black');
+            // window.location.reload();
             return;
         }
 
