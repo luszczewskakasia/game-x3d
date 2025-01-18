@@ -171,7 +171,7 @@ class ChessScene {
         this.loaded_scene = true;
         // console.log(this.board);
 
-        hud.ClockAnimation(600,600,this)
+        
 
     }
 
@@ -199,6 +199,9 @@ class ChessScene {
         });
         document.getElementById('White_resignButton').addEventListener('click', () => {
             hud.endGame('black');
+        });
+        document.getElementById("Black_startButton").addEventListener('click', () => {
+            hud.ClockAnimation(600,600,this);
         });
     }
 
