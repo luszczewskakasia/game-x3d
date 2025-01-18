@@ -148,6 +148,8 @@ export class Animation {
  
 
 
+            console.log(this.gameState.fieldArray);
+
             requestAnimationFrame(() => animate_up);
         }
 
