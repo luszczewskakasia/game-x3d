@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 
+let test_client = io();
 export class Animation {
     constructor() {
         this.startTime = 10000;
@@ -67,6 +68,17 @@ export class Animation {
         const animation_duration = 1.0;
         const starting_position = 0.5;
         const target_position = 2.4;
+        console.log(this.gameState.fieldArray[1][1]);
+        // setInterval(() => {
+        //     if (this.gameState.fieldArray[1][1].piece_on) {
+        //         test_client.emit('update_game_state', this.gameState);
+        //         console.log('Wysłano stan gry:', this.gameState);
+        //     }
+        //     else {
+        //         test_client.emit('update_game_state', this.gameState);
+        //         console.log('Nie wysłano stanu gry:', this.gameState);
+        //     }
+        // }, 300);
         const animate_up = (time) => {
             is_Animating = true;
             requestAnimationFrame(animate_up);
@@ -82,11 +94,13 @@ export class Animation {
             }
             const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3); // Ease-out
             object.position.y = starting_position + (target_position - starting_position) * easing_factor;
+ 
 
-            console.log(this.gameState.fieldArray);
 
             requestAnimationFrame(() => animate_up);
         }
+
+
         requestAnimationFrame(animate_up);
     }
 

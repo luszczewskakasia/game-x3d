@@ -48,7 +48,7 @@ setInterval(() => {
         client.emit('update_game_state', gameState);
         console.log('Nie wysłano stanu gry:', gameState);
     }
-}, 100);
+}, 1000);
 
 client.on('broadcast_game_state', (updatedGameState) => {
     console.log('Otrzymano stan gry od serwera:', updatedGameState);
