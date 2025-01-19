@@ -1,11 +1,9 @@
 import * as THREE from 'three';
 
-
 export class Clients {
     constructor(board) {
 
         this.client = io();
-
         this.board_state = board;
         this.last_choosen = {row : null , col : null};
         this.new_field = {row : null , col : null};

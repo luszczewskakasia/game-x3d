@@ -47,12 +47,10 @@ io.on('connection', (socket) => {
 
     if (players.length === 2) {
         socket.broadcast.emit('second_player_joined');
-        console.log('Dowiezion');
+        console.log("dowiezion");
     }
 
     });
-
-
 
     socket.on('UPdate_game_state', (gameState) => {
     console.log('Podniesion:', gameState.row,gameState.col );
@@ -66,26 +64,14 @@ io.on('connection', (socket) => {
     socket.broadcast.emit('broadcast_state_down', gameState);
     });
 
+
     socket.on('restart', () => {
-        players = [];});
+      console.log('Restart triggered by:', username);
+      players = [];
+      console.log(players);
+      io.emit('start_again');
+    });
 
-//   socket.on('moveUp', (data) => {
-//     if (players[currentPlayerIndex] === username) {
-//         console.log(`${username} moved piece up`);
-//         socket.broadcast.emit('moveUp', data);
-
-//         currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-//     }
-// });
-
-// socket.on('moveDown', (data) => {
-//     if (players[currentPlayerIndex] === username) {
-//         console.log(`${username} moved piece down`);
-//         socket.broadcast.emit('moveDown', data);
-
-//         currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-//     }
-// });
 
 });
 

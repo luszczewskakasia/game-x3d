@@ -10,7 +10,7 @@ import  * as hud from './HUD.js'
 
 let board;
 
-class ChessScene {
+export class ChessScene {
     constructor() {
         this.scene = new THREE.Scene();
         this.camera = this.create_camera();
@@ -47,6 +47,7 @@ class ChessScene {
     {
         this.create_lightning();
         this.create_chessboard();
+        this.create_pieces();
         this.renderer.setAnimationLoop(() => this.animate());
     }
 
@@ -100,12 +101,7 @@ class ChessScene {
     }
 
     create_chessboard() {
-    //     const background_geo = new THREE.BoxGeometry(9, 1, 9);
-    //     const background_material = new THREE.MeshBasicMaterial({ color: 0x964B00 });
-    //     const background_cube = new THREE.Mesh(background_geo, background_material);
-    //     this.scene.add(background_cube);
         tex.create_chessboard_mesh().then((chessboard) => {
-            // console.log(chessboard)
             this.scene.add(chessboard);
         })
         this.scene.add(tex.create_chessboard_mesh())
@@ -114,7 +110,6 @@ class ChessScene {
         const cols = 8;
         const square_geo = new THREE.BoxGeometry(square_size-0.04, 0.1, square_size-0.04);
         this.board = new THREE.Group();
-
 
         for (let row = 0; row < rows; row++) {
             this.fieldArray[row] = [];
@@ -129,10 +124,27 @@ class ChessScene {
                 square_mesh.userData = new pieces.Field(row,col,square_mesh.material,square_mesh)
                 square_mesh.type = "Field";
                 this.fieldArray[row][col] = square_mesh.userData;
-                this.board.add(square_mesh);
+                this.board.add(square_mesh); 
+            }
+        }
+        this.scene.add(this.board);
 
+    }
+
+    create_pieces() {
+        const square_size = 1;
+        const rows = 8;
+        const cols = 8;
+
+
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < cols; col++) {
+
+                const translation_x = (col - (cols - 1)/ 2) * square_size;
+                const translation_z = (row - (rows - 1)/ 2) * square_size;
 
                 if (row === 1 || row === 6) {
+                    console.log(this.fieldArray[row][col]);
                     const pawn = pieces.Piece.createPiece("pawn", row === 1 ? "white" : "black", row, col, translation_x, translation_z, this.board, this.fieldArray)
                     this.fieldArray[row][col].piece_on = true;
                     this.fieldArray[row][col].piece = pawn;
@@ -173,22 +185,13 @@ class ChessScene {
             }
         }
         this.loaded_scene = true;
-        // console.log(this.board);
-
-        
-
+        // console.log(this.board);   
     }
 
     animate() {
         this.drag_object(); 
         if (this.loaded_scene) {
-            // setTimeout(() => {
-            //     Animation.bounce(this.scene, 3, 1, 0.5, 0);
-            // }, 5000);
 
-            // setTimeout(() => {
-            //     Animation.second_order_model(this.scene, 0, params, 0.5);
-            // }, 5000);
             
         }
         this.renderer.render(this.scene, this.camera);
