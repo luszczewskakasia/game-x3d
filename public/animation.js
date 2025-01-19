@@ -15,7 +15,7 @@ export class Clients {
             document.getElementById("endGameBar").style.display = 'none';
             document.getElementById("startScreen").style.display = 'flex';
             this.addUsername();
-            this.board_state.create_pieces();
+            this.board_state.updateBoardState();
 
         });
 

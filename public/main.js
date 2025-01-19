@@ -131,7 +131,7 @@ export class ChessScene {
 
     }
 
-    create_pieces() {
+    async create_pieces() {
         const square_size = 1;
         const rows = 8;
         const cols = 8;
@@ -401,14 +401,14 @@ export class ChessScene {
             this.is_Animating = true;
             const Start_Field = this.fieldArray[last_position.row][last_position.col]
             const Final_Field = this.fieldArray[new_position.row][new_position.col]
-            //console.log(Start_Field)
+            console.log(Start_Field)
 
             var object = Start_Field.piece;
             if (object instanceof Promise) {
                 object = await object;
             }
 
-            console.log(object)
+            // console.log(object)
 
             this.draggable_obj = object.mesh
             const obj = Final_Field.mesh
@@ -439,21 +439,43 @@ export class ChessScene {
     async remove_pieces() {
         for (let row = 0; row < this.fieldArray.length; row++) {
             for (let col = 0; col < this.fieldArray[0].length; col++) {
-                Final_Field.piece = object
-                if(Final_Field.piece) {
-                        var rem_piece = Final_Field.piece;
-                        if (rem_piece instanceof Promise) {
-                            rem_piece = await rem_piece;
-                        }
 
-                        hud.addCapturedPiece(rem_piece.color, rem_piece.type,this)
-                        this.board.remove(rem_piece.mesh);
+                if(this.draggable_obj)
+                {
+                    this.board.remove(this.draggable_obj);
+                    this.is_draggable = false;
+                }
+                this.animations.ready_up = true;
+                this.animations.ready_ftf = true;
+                this.animations.ready_down = true;
+                this.turn = true;
+                this.is_Animating = false;
+                this.pointsBlack = 0;
+                this.pointsWhite = 0;
+
+                var Field = this.fieldArray[row][col]
+                if(Field.piece) {
+                    var Piece_to_remove = Field.piece;
+                    if (Piece_to_remove instanceof Promise) {
+                        Piece_to_remove = await Piece_to_remove;
+                    }
+                    this.board.remove(Piece_to_remove.mesh);
+                    Field.piece = null;
+                    Field.piece_on = false;
+                    Field.legal = false;
+                    Field.material.emissive.set(0x000000)
 
                 }
             }
 
         }
+
     }
+    async updateBoardState() {
+        await this.remove_pieces();
+        await this.create_pieces();
+    }
+
 
 
 }
