@@ -190,16 +190,22 @@ export class Queen extends Piece {
             let c = this.column + dir.dc;
 
             while (r >= 0 && r < fieldArray.length && c >= 0 && c < fieldArray[r].length) {
-                const field = board.children[r * 8 + c];
+                let field = board.children[r * 8 + c];
 
+                const ogFieldSource = board.children[this.row * 8 + this.column];
+                const ogFieldTarget = field;
 
+                field = ogFieldSource.cloneNode(true);
+                board.children[this.row * 8 + this.column].piece_on = false;
 
                 let isKingChecked = isKingInCheck(this.color, chessScene)
                 if (isKingChecked instanceof Promise) {
                     isKingChecked = await isKingChecked;
                 }
 
-                console.log("Czy król jest zaszachowany? ", isKingChecked);
+                if (!isKingChecked) {
+                    field = ogFieldTarget;
+                    board.children[this.row * 8 + this.column].piece_on = true;
 
                     if (field.userData.piece_on) {
                         if (field.userData.piece.color == this.color) {
@@ -217,8 +223,13 @@ export class Queen extends Piece {
                         field.userData.legal = true;
                         legalMoves.push({row: r, column: c});
                     }
-                r += dir.dr;
-                c += dir.dc;
+                    r += dir.dr;
+                    c += dir.dc;
+                } else {
+                    field = ogFieldTarget;
+                    board.children[this.row * 8 + this.column].piece_on = true;
+                }
+
 
             }
         }
@@ -380,13 +391,19 @@ export class Rook extends Piece {
     }
 
 
-    move_rules(chessScene, shouldIPaint) {
+    async move_rules(chessScene, shouldIPaint) {
         const board = chessScene.board
         const fieldArray = chessScene.fieldArray
         const legalMoves = [];
         const currentField = board.children[this.row * 8 + this.column];
         currentField.userData.legal = true;
         if (shouldIPaint) currentField.material.emissive.set(0xff0000);
+
+        let isKingChecked = isKingInCheck(this.color, chessScene)
+        if (isKingChecked instanceof Promise) {
+            isKingChecked = await isKingChecked;
+        }
+        if (isKingChecked) return legalMoves;
 
         //console.log(this.color);
 
@@ -433,7 +450,7 @@ export class Bishop extends Piece {
     }
 
 
-    move_rules(chessScene, shouldIPaint) {
+    async move_rules(chessScene, shouldIPaint) {
         const board = chessScene.board
         const fieldArray = chessScene.fieldArray
         const legalMoves = [];
@@ -441,6 +458,11 @@ export class Bishop extends Piece {
         currentField.userData.legal = true;
         if (shouldIPaint) currentField.material.emissive.set(0xff0000);
 
+        let isKingChecked = isKingInCheck(this.color, chessScene)
+        if (isKingChecked instanceof Promise) {
+            isKingChecked = await isKingChecked;
+        }
+        if (isKingChecked) return legalMoves;
 
         const directions = [
             { dr: -1, dc: -1 },  // up-left
