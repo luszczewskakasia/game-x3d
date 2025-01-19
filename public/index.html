@@ -20,19 +20,18 @@
 </head>
 <body>
   <div class="waiting-screen" id="wait-container">
-    <p id="game-message">Zaczekaj na rozpoczęcie gry...</p>
-    <img id="starting-image" src="" alt="Starting Screen" style="display:none;">
+    <h1>Zaczekaj na rozpoczęcie gry...</h1>
   </div>
   <div class="start-screen" id="startScreen">
     <h1>Zagraj w szachy!</h1>
-    <button class="start-button" id="startGameButton">Start gry</button>
+    <button id="startGameButton">Start gry</button>
   </div>
   <div class="main-column">
     <script type="module" src="/main.js"></script>
      <div id="endGameBar" class="end-game-bar">
         <div class="end-game-content">
             <p id="endGameMessage">Partia zakończona!</p>
-            <button id="restartButton" onClick="window.location.reload();">Zagraj ponownie</button>
+            <button id="restartButton">Zagraj ponownie</button>
 <!--            <button id="closeButton">Zamknij</button>-->
         </div>
     </div>
@@ -43,6 +42,7 @@
           <img class="Profile_photo-img" src="path/to/your/image.jpg" alt="Profile Photo">
       </div> -->
       <div class="Profile_name">Player-W</div>
+      <div class="color" id="color">Białe figury</div>
     </div>
     <div class="clock-container">
       <div class = clock  id = "White_clock">10:00</div>
@@ -63,7 +63,8 @@
           <img class="Profile_photo-img" src="path/to/your/image.jpg" alt="Profile Photo">
       </div> -->
       <div class="Profile_name">Player-B</div>
-    </div>
+      <div class="color" id="color">Czarne figury</div>
+    </div>   
     <div class="clock-container">
       <div class = clock id = "Black_clock">10:00</div>
     </div>
