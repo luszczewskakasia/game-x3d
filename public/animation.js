@@ -25,12 +25,19 @@ export class Clients {
                 // console.log(role)
                 this.name = role
                 this.color = "white";
+                document.getElementById('Black_resignButton').style.display = 'none';
+                document.getElementById('Black_drawButton').style.display = 'none';
 
             } else if (role == 'player2') {
                 document.getElementById("wait-container").style.display = 'none';
                 // console.log(role)
                 this.name = role
                 this.color = "black";
+                document.getElementById('White_resignButton').style.display = 'none';
+                document.getElementById('White_drawButton').style.display = 'none';
+                // console.log(role)
+                this.name = role
+                this.color = "white";
             } else {
                // console.log('Obserwator');
             }
