@@ -25,12 +25,12 @@ export class Clients {
             } else if (role == 'player2') {
                 document.getElementById("wait-container").style.display = 'none';
             } else {
-                console.log('Obserwator');
+               // console.log('Obserwator');
             }
         });
 
         this.client.on('second_player_joined', () => {
-            console.log("Mamy to");
+            // console.log("Mamy to");
             document.getElementById("wait-container").style.display = 'none';});
 
         this.client.on('updatePlayers', (players) => {
@@ -44,20 +44,20 @@ export class Clients {
 
         this.client.on('broadcast_state_up', (gameState) => {
             this.last_choosen = gameState
-            console.log('Nowy stan:', gameState.row , gameState.col);
+            // console.log('Nowy stan:', gameState.row , gameState.col);
         });
 
         this.client.on('broadcast_state_down', (gameState) => {
             this.new_field = gameState
             this.board_state.Enemy_turn_update(this.last_choosen, this.new_field)
-            console.log('Nowy stan:', gameState.row , gameState.col);
+            // console.log('Nowy stan:', gameState.row , gameState.col);
         });
 
         this.client.on('broadcast_new_client', (new_player) => {
             this.name = new_player.name
             this.color = new_player.id === 1 ? "white":"black";
 
-            console.log('Nowy stan:',  new_player.id);
+            // console.log('Nowy stan:',  new_player.id);
         });
 
     }
@@ -70,7 +70,6 @@ export class Clients {
 export class Animation {
     constructor() {
         this.startTime = 10000;
-        this.gameState = null;
     }
 
     static second_order_model(object, params, deltaTime, gameState) {
@@ -85,9 +84,8 @@ export class Animation {
         let PosPrime = new THREE.Vector3(0, 0, 0);
         let PosDoublePrime = new THREE.Vector3(0, 0, 0);
         const simulate = (time) => {
-            requestAnimationFrame(simulate);
 
-            deltaTime = deltaTime || 0.016;
+            // deltaTime = deltaTime || 0.016;
             setpoint = object.userData.setPosition.clone();
             setpointPrime = object.userData.setPositionPrime.clone();
 
@@ -112,34 +110,39 @@ export class Animation {
             Pos.z += PosPrime.z * deltaTime;
             object.position.set(Pos.x, object.position.y, Pos.z);
 
-            if (!object.userData.active && object.position.clone().sub(setpoint.clone()).length() < 0.01) {
+            // console.log("during_anim:", object.position.clone().sub(setpoint.clone()).length());
+
+            const height_mask = new THREE.Vector3(1,0,1)
+
+            const distance = object.position.clone().multiply(height_mask).sub(setpoint.clone().multiply(height_mask)).length()
+
+            if ( distance < 0.04 && !gameState.second_order_done) {
+                gameState.second_order_done = true
+                console.log("Animation done inside simulate:", gameState.second_order_done);
                 return;
+            }
+            else
+            {
+                requestAnimationFrame(simulate);
             }
         };
 
-        if (object.userData.active || object.position.clone().sub(setpoint.clone()).length() >= 0.001) {
-            requestAnimationFrame(() => simulate());
-        } else {
-            is_Animating = false;
-        }
+        requestAnimationFrame(() => simulate());
+
     }
 
-    static Piece_up(object, is_Animating, gameState,other_player) {
-        if (this.gameState = null) {
-            console.log(this.gameState);
-        }
+    static Piece_up(object, gameState,other_player) {
 
-        this.gameState = gameState;
+        gameState.second_order_done = false;
         const animation_duration = 1.0;
         const starting_position = 0.5;
         const target_position = 2.4;
         if(!other_player) {
-            gameState.clients.client.emit('UPdate_game_state', {row: object.userData.row, col: object.userData.column});
-            console.log('Podniesion', object.userData.row, object.userData.column);
+            gameState.clients.client.emit('UPdate_game_state',
+                {row: object.userData.row, col: object.userData.column});
+            //console.log('Podniesion', object.userData.row, object.userData.column);
         }
         const animate_up = (time) => {
-            is_Animating = true;
-            requestAnimationFrame(animate_up);
             if (!this.startTime) {
                 this.startTime = time;
             }
@@ -147,17 +150,14 @@ export class Animation {
 
             if (elapsed >= animation_duration) {
                 object.position.y = target_position;
-                is_Animating = false;
                 return;
+            }
+            else
+            {
+                requestAnimationFrame(animate_up);
             }
             const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3); // Ease-out
             object.position.y = starting_position + (target_position - starting_position) * easing_factor;
- 
-
-
-            console.log(this.gameState.fieldArray);
-
-            requestAnimationFrame(() => animate_up);
         }
 
 
@@ -165,52 +165,97 @@ export class Animation {
     }
 
 
-    static Piece_down(object, is_Animating, gameState,other_player)
+    static Piece_down(object, gameState,other_player)
     {
         const animation_duration = 1.0;
-        const starting_position = 3.0;
+        const starting_position = 2.4;
         const target_position = 0.5;
+        var is_Animating = true;
+
+
         if(!other_player)
         {
-           gameState.clients.client.emit('DOWNdate_game_state', { row: object.userData.row, col: object.userData.column });
-           console.log('Upadł', object.userData.row , object.userData.column);
+           gameState.clients.client.emit('DOWNdate_game_state',
+               { row: object.userData.row, col: object.userData.column });
+           //console.log('Upadł', object.userData.row , object.userData.column);
         }
         const animate_down = (time) => {
-            is_Animating = true;
-            requestAnimationFrame(animate_down);
-            // console.log(object)
-            if (!this.startTime) {
-                this.startTime = time;
-            }
-            const elapsed = (time - this.startTime) / 1000;
+            console.log(!gameState.second_order_done && is_Animating)
+            if(gameState.second_order_done && is_Animating)
+            {
+                if (!this.startTime) {
+                    this.startTime = time;
+                }
+                const elapsed = (time - this.startTime) / 1000;
 
-            if (elapsed >= animation_duration) {
-                object.position.y = target_position;
-                is_Animating = false;
-                // console.log(object)
-                return;
-            }
-            const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3); // Ease-out
-            object.position.y = starting_position + (target_position - starting_position) * easing_factor;
+                if (elapsed >= animation_duration) {
+                    object.position.y = target_position;
+                    gameState.second_order_done = false;
+                    is_Animating = false;
+                    return;
+                }
+                else
+                {
+                    requestAnimationFrame(animate_down);
+                }
+                const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3); // Ease-out
+                object.position.y = starting_position + (target_position - starting_position) * easing_factor;
 
-            requestAnimationFrame(() => animate_down);
+            }
+
+            if(!gameState.second_order_done && is_Animating)
+            {
+                requestAnimationFrame(animate_down);
+            }
         }
         requestAnimationFrame(animate_down);
     }
 
-
-    static Enemy_move_animation(object, params, deltaTime, gameState,other_player)
+    static Piece_field_to_field(object, field, gameState)
     {
-        let is_Animating = false;
-        this.Piece_up(object, is_Animating, gameState,other_player);
+        const animation_duration = 4.0;
+        const starting_position = object.position.clone().multiply(new THREE.Vector3(1,0,1))  ;
+        const target_position = field.position.clone().multiply(new THREE.Vector3(1,0,1)) ;
 
-        setTimeout(() => {
-            this.second_order_model(object, params, deltaTime, is_Animating);
+        const animate_ftf = (time) => {
+            console.log(object.position.y)
+            if(object.position.y === 2.4 )
+            {
+
+                if (!this.startTime) {
+                    this.startTime = time;
+                }
+                const elapsed = (time - this.startTime) / 1000;
+
+                if (elapsed >= animation_duration) {
+                    object.position.x = target_position.x;
+                    object.position.z = target_position.z;
+                    gameState.second_order_done = true;
+                    return;
+                }
+                else
+                {
+                    requestAnimationFrame(animate_ftf);
+                }
+                const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3); // Ease-out
+                object.position.x = starting_position.x + (target_position.x - starting_position.x) * easing_factor;
+                object.position.z = starting_position.z + (target_position.z - starting_position.z) * easing_factor;
+            }
+            else
+            {
+                requestAnimationFrame(animate_ftf);
+            }
+
+        }
+        requestAnimationFrame(animate_ftf);
+    }
 
 
-            setTimeout(() => {
-                this.Piece_down(object, is_Animating, gameState,other_player);
-            }, 1000);
-        }, 1000);
+
+    static Enemy_move_animation(object, field_obj, gameState,other_player)
+    {
+        this.Piece_up(object, gameState,other_player);
+        this.Piece_field_to_field(object, field_obj, gameState,false);
+        this.Piece_down(object, gameState,other_player);
     }
 }

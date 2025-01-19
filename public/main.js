@@ -285,8 +285,8 @@ class ChessScene {
 
                 this.clear_board();
                 this.change_emission(this.draggable_obj);
-                console.log("koniec")
-                Animation.Piece_down(this.draggable_obj, this.is_Animating,this,false)
+                //console.log("koniec")
+                Animation.Piece_down(this.draggable_obj,this,false)
                 this.draggable_obj = null;
                 return;
             }
@@ -308,7 +308,7 @@ class ChessScene {
                     (!this.turn && intersectedObject.userData.color === "black"))
                 {
                     this.draggable_obj = intersectedObject;
-                    Animation.Piece_up(this.draggable_obj,this.is_Animating, this,false);
+                    Animation.Piece_up(this.draggable_obj, this,false);
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
                     intersectedObject.userData.move_rules(this.board,this.fieldArray)
@@ -342,7 +342,7 @@ class ChessScene {
                         this.draggable_obj.userData.setPosition = obj.point.clone()
                     }
                     // var setPointPrime =obj.point.clone().sub( this.draggable_obj.position.clone());
-                    Animation.second_order_model(this.draggable_obj , this.params, 0.05,this.is_Animating);
+                    Animation.second_order_model(this.draggable_obj , this.params, 0.05,this);
                     // this.draggable_obj.position.x = obj.point.x
                     // this.draggable_obj.position.z = obj.point.z
 
@@ -388,7 +388,7 @@ class ChessScene {
     {
         const Start_Field = this.fieldArray[last_position.row][last_position.col]
         const Final_Field = this.fieldArray[new_position.row][new_position.col]
-        console.log(Start_Field)
+        //console.log(Start_Field)
 
         var object = Start_Field.piece;
         if (object instanceof Promise) {
@@ -401,25 +401,12 @@ class ChessScene {
 
         const obj = Final_Field.mesh
 
-        console.log(this.draggable_obj)
-        console.log(obj)
-
-
-
-        this.draggable_obj.userData.setPositionPrime = obj.position.clone().sub( this.draggable_obj.userData.setPosition.clone());
-        this.draggable_obj.userData.setPosition = obj.position.clone()
-        console.log(this.draggable_obj.mesh)
-
-        Animation.Enemy_move_animation(this.draggable_obj,{
-            damping: 2.0,
-            frequency: 1.7,
-            response_factor: 0
-        },0.05,this, true)
+        Animation.Enemy_move_animation(this.draggable_obj, obj,this, true)
 
         this.draggable_obj = Start_Field.piece
 
 
-        console.log(Final_Field)
+        // console.log(Final_Field)
 
 
     }
