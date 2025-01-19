@@ -69,10 +69,16 @@ export class Clients {
 
 export class Animation {
     constructor() {
-        this.startTime = 10000;
+        this.startTime_up = null;
+        this.startTime_down = null;
+        this.startTime_ftf = null;
+        this.startTime_reset = null;
+        this.ready_up = false;
+        this.ready_ftf = false;
+        this.ready_down = false;
     }
 
-    static second_order_model(object, params, deltaTime, gameState) {
+    second_order_model(object, params, deltaTime, gameState) {
         const { damping, frequency, response_factor } = params;
         let setpoint = object.userData.setPosition.clone();
         let setpointPrime = object.userData.setPositionPrime.clone();
@@ -116,9 +122,9 @@ export class Animation {
 
             const distance = object.position.clone().multiply(height_mask).sub(setpoint.clone().multiply(height_mask)).length()
 
-            if ( distance < 0.04 && !gameState.second_order_done) {
-                gameState.second_order_done = true
-                console.log("Animation done inside simulate:", gameState.second_order_done);
+            if (!object.userData.active && distance < 0.04) {
+                this.ready_ftf = true;
+                this.startTime_ftf = null;
                 return;
             }
             else
@@ -131,9 +137,8 @@ export class Animation {
 
     }
 
-    static Piece_up(object, gameState,other_player) {
+    Piece_up(object, gameState,other_player) {
 
-        gameState.second_order_done = false;
         const animation_duration = 1.0;
         const starting_position = 0.5;
         const target_position = 2.4;
@@ -142,30 +147,41 @@ export class Animation {
                 {row: object.userData.row, col: object.userData.column});
             //console.log('Podniesion', object.userData.row, object.userData.column);
         }
-        const animate_up = (time) => {
-            if (!this.startTime) {
-                this.startTime = time;
-            }
-            const elapsed = (time - this.startTime) / 1000;
 
-            if (elapsed >= animation_duration) {
-                object.position.y = target_position;
-                return;
+        const animate_up = (time) => {
+            if(!this.ready_up && !this.ready_ftf && !this.ready_down)
+            {
+                if (!this.startTime_up) {
+                    this.startTime_up = time;
+                }
+                const elapsed = (time - this.startTime_up) / 1000;
+
+                if (elapsed >= animation_duration) {
+                    object.position.y = target_position;
+                    this.ready_up = true;
+                    this.startTime_up = null;
+                    return;
+                }
+                else
+                {
+                    requestAnimationFrame(animate_up);
+                }
+                const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3); // Ease-out
+                object.position.y = starting_position + (target_position - starting_position) * easing_factor;
             }
             else
             {
                 requestAnimationFrame(animate_up);
             }
-            const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3); // Ease-out
-            object.position.y = starting_position + (target_position - starting_position) * easing_factor;
+
         }
+        // requestAnimationFrame(animate_up);
+        requestAnimationFrame(() => animate_up());
 
-
-        requestAnimationFrame(animate_up);
     }
 
 
-    static Piece_down(object, gameState,other_player)
+    Piece_down(object, gameState,other_player)
     {
         const animation_duration = 1.0;
         const starting_position = 2.4;
@@ -180,18 +196,20 @@ export class Animation {
            //console.log('Upadł', object.userData.row , object.userData.column);
         }
         const animate_down = (time) => {
-            console.log(!gameState.second_order_done && is_Animating)
-            if(gameState.second_order_done && is_Animating)
+            if(this.ready_up && this.ready_ftf && !this.ready_down)
             {
-                if (!this.startTime) {
-                    this.startTime = time;
+                if (!this.startTime_down) {
+                    this.startTime_down = time;
                 }
-                const elapsed = (time - this.startTime) / 1000;
+                const elapsed = (time - this.startTime_down) / 1000;
 
                 if (elapsed >= animation_duration) {
                     object.position.y = target_position;
                     gameState.second_order_done = false;
                     is_Animating = false;
+                    this.ready_down = true;
+                    this.startTime_down = null;
+                    console.log(gameState.second_order_done )
                     return;
                 }
                 else
@@ -203,41 +221,40 @@ export class Animation {
 
             }
 
-            if(!gameState.second_order_done && is_Animating)
+            if(!this.ready_ftf && is_Animating)
             {
                 requestAnimationFrame(animate_down);
             }
         }
-        requestAnimationFrame(animate_down);
+        requestAnimationFrame(() => animate_down());
     }
 
-    static Piece_field_to_field(object, field, gameState)
+    Piece_field_to_field(object, field)
     {
         const animation_duration = 4.0;
         const starting_position = object.position.clone().multiply(new THREE.Vector3(1,0,1))  ;
         const target_position = field.position.clone().multiply(new THREE.Vector3(1,0,1)) ;
 
         const animate_ftf = (time) => {
-            console.log(object.position.y)
-            if(object.position.y === 2.4 )
+            if(this.ready_up && ! this.ready_ftf && !this.ready_down)
             {
-
-                if (!this.startTime) {
-                    this.startTime = time;
+                if (!this.startTime_ftf) {
+                    this.startTime_ftf = time;
                 }
-                const elapsed = (time - this.startTime) / 1000;
+                const elapsed = (time - this.startTime_ftf) / 1000;
 
                 if (elapsed >= animation_duration) {
                     object.position.x = target_position.x;
                     object.position.z = target_position.z;
-                    gameState.second_order_done = true;
+                    this.ready_ftf = true;
+                    this.startTime_ftf = null;
                     return;
                 }
                 else
                 {
                     requestAnimationFrame(animate_ftf);
                 }
-                const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3); // Ease-out
+                const easing_factor = 1 - Math.pow(1 - elapsed / animation_duration, 3)
                 object.position.x = starting_position.x + (target_position.x - starting_position.x) * easing_factor;
                 object.position.z = starting_position.z + (target_position.z - starting_position.z) * easing_factor;
             }
@@ -247,15 +264,34 @@ export class Animation {
             }
 
         }
-        requestAnimationFrame(animate_ftf);
+        requestAnimationFrame(() => animate_ftf());
     }
 
 
-
-    static Enemy_move_animation(object, field_obj, gameState,other_player)
+    Reset_animation()
     {
-        this.Piece_up(object, gameState,other_player);
-        this.Piece_field_to_field(object, field_obj, gameState,false);
-        this.Piece_down(object, gameState,other_player);
+        const animate_reset = (time) => {
+            if(this.ready_up && this.ready_ftf && this.ready_down){
+                this.ready_up = false;
+                this.ready_ftf = false;
+                this.ready_down = false;
+                console.log(this.ready_up, this.ready_ftf, this.ready_down)
+                return
+            }
+            else
+            {
+                console.log(this.ready_up, this.ready_ftf, this.ready_down)
+                requestAnimationFrame(animate_reset);
+            }
+        }
+        requestAnimationFrame(() => animate_reset());
+    }
+
+    Enemy_move_animation(object, field_obj, gameState,other_player)
+    {
+       gameState.animations.Piece_up(object, gameState,other_player);
+       gameState.animations.Piece_field_to_field(object, field_obj, gameState);
+       gameState.animations.Piece_down(object, gameState,other_player);
+       gameState.animations.Reset_animation()
     }
 }

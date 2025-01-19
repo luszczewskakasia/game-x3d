@@ -33,12 +33,11 @@ class ChessScene {
             frequency: 0.4,
             response_factor: 0
         };
-        this.second_order_done = false;
         this.clients = new Clients(this)
 
         this.pointsBlack = 0;
         this.pointsWhite = 0;
-
+        this.animations = new Animation();
         this.init_scene();
 
         this.init_event_listeners();  
@@ -286,7 +285,7 @@ class ChessScene {
                 this.clear_board();
                 this.change_emission(this.draggable_obj);
                 //console.log("koniec")
-                Animation.Piece_down(this.draggable_obj,this,false)
+                this.animations.Piece_down(this.draggable_obj,this,false)
                 this.draggable_obj = null;
                 return;
             }
@@ -308,7 +307,8 @@ class ChessScene {
                     (!this.turn && intersectedObject.userData.color === "black"))
                 {
                     this.draggable_obj = intersectedObject;
-                    Animation.Piece_up(this.draggable_obj, this,false);
+                    this.animations.Piece_up(this.draggable_obj, this,false);
+                    this.animations.Reset_animation()
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
                     intersectedObject.userData.move_rules(this.board,this.fieldArray)
@@ -342,7 +342,7 @@ class ChessScene {
                         this.draggable_obj.userData.setPosition = obj.point.clone()
                     }
                     // var setPointPrime =obj.point.clone().sub( this.draggable_obj.position.clone());
-                    Animation.second_order_model(this.draggable_obj , this.params, 0.05,this);
+                    this.animations.second_order_model(this.draggable_obj , this.params, 0.15,this);
                     // this.draggable_obj.position.x = obj.point.x
                     // this.draggable_obj.position.z = obj.point.z
 
@@ -386,30 +386,42 @@ class ChessScene {
     async Enemy_turn_update(last_position, new_position)
 
     {
-        const Start_Field = this.fieldArray[last_position.row][last_position.col]
-        const Final_Field = this.fieldArray[new_position.row][new_position.col]
-        //console.log(Start_Field)
+        // if(last_position.row !== new_position.row && last_position.col !== new_position.col )
+        // {
+            const Start_Field = this.fieldArray[last_position.row][last_position.col]
+            const Final_Field = this.fieldArray[new_position.row][new_position.col]
+            //console.log(Start_Field)
 
-        var object = Start_Field.piece;
-        if (object instanceof Promise) {
-            object = await object;
+            var object = Start_Field.piece;
+            if (object instanceof Promise) {
+                object = await object;
+            }
+
+            console.log(object)
+
+            this.draggable_obj = object.mesh
+            const obj = Final_Field.mesh
+            this.animations.Enemy_move_animation(this.draggable_obj, obj,this, true)
+            this.draggable_obj = Start_Field.piece
+
+            Start_Field.piece = null
+            if(Final_Field.piece)
+            {
+                var rem_piece = Final_Field.piece;
+                if (rem_piece instanceof Promise) {
+                    rem_piece = await rem_piece;
+                }
+
+                hud.addCapturedPiece(rem_piece.color, rem_piece.type,this)
+                this.board.remove(rem_piece.mesh);
+
+            }
+        this.turn = !this.turn;
+        Final_Field.piece = object
+
         }
-
-
-
-        this.draggable_obj = object.mesh
-
-        const obj = Final_Field.mesh
-
-        Animation.Enemy_move_animation(this.draggable_obj, obj,this, true)
-
-        this.draggable_obj = Start_Field.piece
-
-
-        // console.log(Final_Field)
-
-
-    }
+    // console.log(Final_Field)
+    // }
 
 
 }
