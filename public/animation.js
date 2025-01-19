@@ -209,7 +209,7 @@ export class Animation {
                     is_Animating = false;
                     this.ready_down = true;
                     this.startTime_down = null;
-                    console.log(gameState.second_order_done )
+                    //console.log(gameState.second_order_done )
                     return;
                 }
                 else
@@ -275,12 +275,12 @@ export class Animation {
                 this.ready_up = false;
                 this.ready_ftf = false;
                 this.ready_down = false;
-                console.log(this.ready_up, this.ready_ftf, this.ready_down)
+                //console.log(this.ready_up, this.ready_ftf, this.ready_down)
                 return
             }
             else
             {
-                console.log(this.ready_up, this.ready_ftf, this.ready_down)
+                //console.log(this.ready_up, this.ready_ftf, this.ready_down)
                 requestAnimationFrame(animate_reset);
             }
         }

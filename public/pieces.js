@@ -167,11 +167,6 @@ export class Queen extends Piece {
     }
 
     async move_rules(chessScene, shouldIPaint) {
-        let czyJestKrolZaszachowany = isKingInCheck(this.color, chessScene)
-        if (czyJestKrolZaszachowany instanceof Promise) {
-            czyJestKrolZaszachowany = await czyJestKrolZaszachowany;
-        }
-        console.log("Czy król jest zaszachowany? ", czyJestKrolZaszachowany);
         const board = chessScene.board
         const fieldArray = chessScene.fieldArray
         const legalMoves = [];
@@ -196,24 +191,35 @@ export class Queen extends Piece {
 
             while (r >= 0 && r < fieldArray.length && c >= 0 && c < fieldArray[r].length) {
                 const field = board.children[r * 8 + c];
-                if (field.userData.piece_on) {
-                    if (field.userData.piece.color == this.color) {
-                        console.log(field.userData.piece.color)
-                        field.userData.legal = false;
-                        break;
+
+
+
+                let isKingChecked = isKingInCheck(this.color, chessScene)
+                if (isKingChecked instanceof Promise) {
+                    isKingChecked = await isKingChecked;
+                }
+
+                console.log("Czy król jest zaszachowany? ", isKingChecked);
+
+                    if (field.userData.piece_on) {
+                        if (field.userData.piece.color == this.color) {
+                            console.log(field.userData.piece.color)
+                            field.userData.legal = false;
+                            break;
+                        } else {
+                            if (shouldIPaint) field.material.emissive.set(0xff0000);
+                            field.userData.legal = true;
+                            legalMoves.push({row: r, column: c});
+                            break;
+                        }
                     } else {
                         if (shouldIPaint) field.material.emissive.set(0xff0000);
                         field.userData.legal = true;
-                        legalMoves.push({ row: r, column: c });
-                        break;
+                        legalMoves.push({row: r, column: c});
                     }
-                } else {
-                    if (shouldIPaint) field.material.emissive.set(0xff0000);
-                    field.userData.legal = true;
-                    legalMoves.push({ row: r, column: c });
-                }
                 r += dir.dr;
                 c += dir.dc;
+
             }
         }
 
@@ -382,7 +388,7 @@ export class Rook extends Piece {
         currentField.userData.legal = true;
         if (shouldIPaint) currentField.material.emissive.set(0xff0000);
 
-        console.log(this.color);
+        //console.log(this.color);
 
         const directions = [
             { dr: -1, dc: 0 },  // up
