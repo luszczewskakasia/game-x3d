@@ -436,6 +436,25 @@ export class ChessScene {
     // console.log(Final_Field)
     }
 
+    async remove_pieces() {
+        for (let row = 0; row < this.fieldArray.length; row++) {
+            for (let col = 0; col < this.fieldArray[0].length; col++) {
+                Final_Field.piece = object
+                if(Final_Field.piece) {
+                        var rem_piece = Final_Field.piece;
+                        if (rem_piece instanceof Promise) {
+                            rem_piece = await rem_piece;
+                        }
+
+                        hud.addCapturedPiece(rem_piece.color, rem_piece.type,this)
+                        this.board.remove(rem_piece.mesh);
+
+                }
+            }
+
+        }
+    }
+
 
 }
 
