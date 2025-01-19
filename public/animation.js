@@ -20,6 +20,7 @@ export class Clients {
         });
 
         document.getElementById('restartButton').addEventListener('click', () => {
+            document.getElementById("endGameBar").style.display = 'flex';
             this.client.emit('restart');
             console.log('Restart');
         });

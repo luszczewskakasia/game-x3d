@@ -445,9 +445,8 @@ export class ChessScene {
                     this.board.remove(this.draggable_obj);
                     this.is_draggable = false;
                 }
-                this.animations.ready_up = true;
-                this.animations.ready_ftf = true;
-                this.animations.ready_down = true;
+                delete this.animations;
+                this.animations = new Animation();
                 this.turn = true;
                 this.is_Animating = false;
                 this.pointsBlack = 0;
