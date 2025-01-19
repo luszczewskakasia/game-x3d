@@ -11,6 +11,7 @@ export class Clients {
         this.new_field = {row : null , col : null};
         this.name = ""
         this.color = null;
+
         let username = null;
         if (username == null){
             username = prompt("Wpisz nazwę użytkownika");
@@ -21,9 +22,15 @@ export class Clients {
             if (role == 'player1') {
                 // document.getElementById('game-message').innerText = data.message;
                 document.querySelector('.overlay-column.left .Profile_name').textContent = username;
+                // console.log(role)
+                this.name = role
+                this.color = "white";
 
             } else if (role == 'player2') {
                 document.getElementById("wait-container").style.display = 'none';
+                // console.log(role)
+                this.name = role
+                this.color = "black";
             } else {
                // console.log('Obserwator');
             }
@@ -53,12 +60,14 @@ export class Clients {
             // console.log('Nowy stan:', gameState.row , gameState.col);
         });
 
-        this.client.on('broadcast_new_client', (new_player) => {
-            this.name = new_player.name
-            this.color = new_player.id === 1 ? "white":"black";
+        // this.client.on('broadcast_new_client', (new_player) => {
+        //      if(new_player.id < 2)
+        //      {
 
-            // console.log('Nowy stan:',  new_player.id);
-        });
+        //      }
+        //
+        //     // console.log('Nowy stan:',  new_player.id);
+        // });
 
     }
 }
@@ -140,7 +149,7 @@ export class Animation {
     Piece_up(object, gameState,other_player) {
 
         const animation_duration = 1.0;
-        const starting_position = 0.5;
+        const starting_position = object.position.y;
         const target_position = 2.4;
         if(!other_player) {
             gameState.clients.client.emit('UPdate_game_state',
@@ -154,7 +163,12 @@ export class Animation {
                 if (!this.startTime_up) {
                     this.startTime_up = time;
                 }
-                const elapsed = (time - this.startTime_up) / 1000;
+
+                var elapsed = (time - this.startTime_up) / 1000;
+                if(isNaN(elapsed)  || elapsed === 0)
+                {
+                    elapsed = 0.1;
+                }
 
                 if (elapsed >= animation_duration) {
                     object.position.y = target_position;
@@ -184,7 +198,7 @@ export class Animation {
     Piece_down(object, gameState,other_player)
     {
         const animation_duration = 1.0;
-        const starting_position = 2.4;
+        const starting_position = object.position.y;
         const target_position = 0.5;
         var is_Animating = true;
 
@@ -201,15 +215,18 @@ export class Animation {
                 if (!this.startTime_down) {
                     this.startTime_down = time;
                 }
-                const elapsed = (time - this.startTime_down) / 1000;
-
+                var elapsed = (time - this.startTime_down) / 1000;
+                if(isNaN(elapsed)  || elapsed === 0)
+                {
+                    elapsed = 0.1;
+                }
                 if (elapsed >= animation_duration) {
                     object.position.y = target_position;
                     gameState.second_order_done = false;
                     is_Animating = false;
                     this.ready_down = true;
                     this.startTime_down = null;
-                    console.log(gameState.second_order_done )
+                    // console.log(gameState.second_order_done )
                     return;
                 }
                 else
@@ -231,7 +248,7 @@ export class Animation {
 
     Piece_field_to_field(object, field)
     {
-        const animation_duration = 4.0;
+        const animation_duration = 3.0;
         const starting_position = object.position.clone().multiply(new THREE.Vector3(1,0,1))  ;
         const target_position = field.position.clone().multiply(new THREE.Vector3(1,0,1)) ;
 
@@ -241,8 +258,11 @@ export class Animation {
                 if (!this.startTime_ftf) {
                     this.startTime_ftf = time;
                 }
-                const elapsed = (time - this.startTime_ftf) / 1000;
-
+                var elapsed = (time - this.startTime_ftf) / 1000;
+                if(isNaN(elapsed) || elapsed === 0)
+                {
+                    elapsed = 0.1;
+                }
                 if (elapsed >= animation_duration) {
                     object.position.x = target_position.x;
                     object.position.z = target_position.z;
@@ -268,19 +288,21 @@ export class Animation {
     }
 
 
-    Reset_animation()
+    Reset_animation(gameState)
     {
         const animate_reset = (time) => {
             if(this.ready_up && this.ready_ftf && this.ready_down){
                 this.ready_up = false;
                 this.ready_ftf = false;
                 this.ready_down = false;
-                console.log(this.ready_up, this.ready_ftf, this.ready_down)
+                console.log(gameState)
+                gameState.is_Animating = false;
+                // console.log(this.ready_up, this.ready_ftf, this.ready_down)
                 return
             }
             else
             {
-                console.log(this.ready_up, this.ready_ftf, this.ready_down)
+                // console.log(this.ready_up, this.ready_ftf, this.ready_down)
                 requestAnimationFrame(animate_reset);
             }
         }
@@ -292,6 +314,6 @@ export class Animation {
        gameState.animations.Piece_up(object, gameState,other_player);
        gameState.animations.Piece_field_to_field(object, field_obj, gameState);
        gameState.animations.Piece_down(object, gameState,other_player);
-       gameState.animations.Reset_animation()
+       gameState.animations.Reset_animation(gameState)
     }
 }

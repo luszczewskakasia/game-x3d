@@ -25,7 +25,6 @@ class ChessScene {
         this.is_draggable = false;
         this.board = null;
         this.loaded_scene = false;
-        this.turn = true;
         this.is_Animating = false;
         this.fieldArray = [];
         this.params = {
@@ -35,6 +34,7 @@ class ChessScene {
         };
         this.clients = new Clients(this)
 
+        this.turn = true;
         this.pointsBlack = 0;
         this.pointsWhite = 0;
         this.animations = new Animation();
@@ -301,14 +301,21 @@ class ChessScene {
             const intersectedObject = intersects[0].object;
             // intersectedObject.userData.draggable = !intersectedObject.userData.draggable;
 
+
+            console.log(this.turn , this.clients.color)
+
+
             if (!intersectedObject.userData.active && intersectedObject.userData.draggable) {
                 if(
-                    (this.turn && intersectedObject.userData.color === "white") ||
-                    (!this.turn && intersectedObject.userData.color === "black"))
+                    (this.turn && this.clients.color == "white" &&
+                        intersectedObject.userData.color === "white") ||
+                    (!this.turn && this.clients.color == "black" &&
+                        intersectedObject.userData.color === "black"))
                 {
                     this.draggable_obj = intersectedObject;
+                    this.is_Animating = true;
                     this.animations.Piece_up(this.draggable_obj, this,false);
-                    this.animations.Reset_animation()
+                    this.animations.Reset_animation(this)
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
                     intersectedObject.userData.move_rules(this.board,this.fieldArray)
@@ -384,10 +391,11 @@ class ChessScene {
     }
 
     async Enemy_turn_update(last_position, new_position)
-
     {
-        // if(last_position.row !== new_position.row && last_position.col !== new_position.col )
-        // {
+        console.log(last_position, new_position)
+        if(last_position.row !== new_position.row || last_position.col !== new_position.col )
+        {
+            this.is_Animating = true;
             const Start_Field = this.fieldArray[last_position.row][last_position.col]
             const Final_Field = this.fieldArray[new_position.row][new_position.col]
             //console.log(Start_Field)
@@ -405,6 +413,7 @@ class ChessScene {
             this.draggable_obj = Start_Field.piece
 
             Start_Field.piece = null
+            Start_Field.piece_on = false;
             if(Final_Field.piece)
             {
                 var rem_piece = Final_Field.piece;
@@ -418,10 +427,11 @@ class ChessScene {
             }
         this.turn = !this.turn;
         Final_Field.piece = object
-
+        Final_Field.piece_on = true
+        this.draggable_obj = null
         }
     // console.log(Final_Field)
-    // }
+    }
 
 
 }
