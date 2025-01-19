@@ -13,8 +13,8 @@ export class Clients {
 
         this.client.on('start_again', () => { 
             document.getElementById("endGameBar").style.display = 'none';
+            document.getElementById("startScreen").style.display = 'flex';
             this.addUsername();
-            document.getElementById("start-screen").style.display = 'flex';
             this.board_state.create_pieces();
 
         });
