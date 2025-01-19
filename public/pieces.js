@@ -166,11 +166,18 @@ export class Queen extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board, fieldArray) {
+    async move_rules(chessScene, shouldIPaint) {
+        let czyJestKrolZaszachowany = isKingInCheck(this.color, chessScene)
+        if (czyJestKrolZaszachowany instanceof Promise) {
+            czyJestKrolZaszachowany = await czyJestKrolZaszachowany;
+        }
+        console.log("Czy król jest zaszachowany? ", czyJestKrolZaszachowany);
+        const board = chessScene.board
+        const fieldArray = chessScene.fieldArray
         const legalMoves = [];
         const currentField = board.children[this.row * 8 + this.column];
         currentField.userData.legal = true;
-        currentField.material.emissive.set(0xff0000);
+        if (shouldIPaint) currentField.material.emissive.set(0xff0000);
 
         const directions = [
             { dr: -1, dc: 0 },   // up
@@ -195,15 +202,15 @@ export class Queen extends Piece {
                         field.userData.legal = false;
                         break;
                     } else {
-                        field.material.emissive.set(0xff0000);
+                        if (shouldIPaint) field.material.emissive.set(0xff0000);
                         field.userData.legal = true;
-                        legalMoves.push(field);
+                        legalMoves.push({ row: r, column: c });
                         break;
                     }
                 } else {
-                    field.material.emissive.set(0xff0000);
+                    if (shouldIPaint) field.material.emissive.set(0xff0000);
                     field.userData.legal = true;
-                    legalMoves.push(field);
+                    legalMoves.push({ row: r, column: c });
                 }
                 r += dir.dr;
                 c += dir.dc;
@@ -221,7 +228,10 @@ export class King extends Piece {
         super(type, color, row, column, mesh, fieldArray);
     }
 
-    async move_rules(board, fieldArray) {
+
+    async move_rules(chessScene, shouldIPaint) {
+        const board = chessScene.board
+        const fieldArray = chessScene.fieldArray
         const legalMoves = [];
         const directions = [
             { dr: 0, dc: 0 },   // stay
@@ -269,8 +279,8 @@ export class King extends Piece {
 
                 if (targetRow === this.row && targetColumn === this.column) {
                     field.userData.legal = true;
-                    field.material.emissive.set(0xff0000);
-                    legalMoves.push(field);
+                    if (shouldIPaint) field.material.emissive.set(0xff0000);
+                    legalMoves.push({ row: targetRow, column: targetColumn });
                     continue;
                 }
 
@@ -282,13 +292,13 @@ export class King extends Piece {
                         if (field.userData.piece_on) {
                             if (field.userData.piece.color !== this.color) {
                                 field.userData.legal = true;
-                                field.material.emissive.set(0xff0000);
-                                legalMoves.push(field);
+                                if (shouldIPaint) field.material.emissive.set(0xff0000);
+                                legalMoves.push({ row: targetRow, column: targetColumn });
                             }
                         } else {
                             field.userData.legal = true;
-                            field.material.emissive.set(0xff0000);
-                            legalMoves.push(field);
+                            if (shouldIPaint) field.material.emissive.set(0xff0000);
+                            legalMoves.push({ row: targetRow, column: targetColumn });
                         }
                     }
                 }
@@ -304,7 +314,10 @@ export class Knight extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board, fieldArray) {
+
+    async move_rules(chessScene, shouldIPaint) {
+        const board = chessScene.board
+        const fieldArray = chessScene.fieldArray
         const legalMoves = [];
         const knightMoves = [
             { row: 0, col: 0},
@@ -330,7 +343,7 @@ export class Knight extends Piece {
                         targetColumn === this.column + move.col
                     ) {
                         field.userData.legal = true;
-                        legalMoves.push(field);
+                        legalMoves.push({ row: targetRow, column: targetColumn });
 
                         const targetField = fieldArray[targetRow][targetColumn];
                         if (targetField.piece_on) {
@@ -342,7 +355,7 @@ export class Knight extends Piece {
                         }
 
                         if (field.userData.legal) {
-                            field.material.emissive.set(0xff0000);
+                            if (shouldIPaint) field.material.emissive.set(0xff0000);
                         }
                     }
                 });
@@ -360,11 +373,14 @@ export class Rook extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board,fieldArray) {
+
+    move_rules(chessScene, shouldIPaint) {
+        const board = chessScene.board
+        const fieldArray = chessScene.fieldArray
         const legalMoves = [];
         const currentField = board.children[this.row * 8 + this.column];
         currentField.userData.legal = true;
-        currentField.material.emissive.set(0xff0000);
+        if (shouldIPaint) currentField.material.emissive.set(0xff0000);
 
         console.log(this.color);
 
@@ -386,15 +402,15 @@ export class Rook extends Piece {
                         field.userData.legal = false;
                         break;
                     } else {
-                        field.material.emissive.set(0xff0000);
+                        if (shouldIPaint) field.material.emissive.set(0xff0000);
                         field.userData.legal = true;
-                        legalMoves.push(field);
+                        legalMoves.push({ row: r, column: c });
                         break;
                     }
                 } else {
-                    field.material.emissive.set(0xff0000);
+                    if (shouldIPaint) field.material.emissive.set(0xff0000);
                     field.userData.legal = true;
-                    legalMoves.push(field);
+                    legalMoves.push({ row: r, column: c });
                 }
                 r += dir.dr;
                 c += dir.dc;
@@ -410,11 +426,14 @@ export class Bishop extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board, fieldArray) {
+
+    move_rules(chessScene, shouldIPaint) {
+        const board = chessScene.board
+        const fieldArray = chessScene.fieldArray
         const legalMoves = [];
         const currentField = board.children[this.row * 8 + this.column];
         currentField.userData.legal = true;
-        currentField.material.emissive.set(0xff0000);
+        if (shouldIPaint) currentField.material.emissive.set(0xff0000);
 
 
         const directions = [
@@ -435,15 +454,15 @@ export class Bishop extends Piece {
                         field.userData.legal = false;
                         break;
                     } else {
-                        field.material.emissive.set(0xff0000);
+                        if (shouldIPaint) field.material.emissive.set(0xff0000);
                         field.userData.legal = true;
-                        legalMoves.push(field);
+                        legalMoves.push({ row: r, column: c });
                         break;
                     }
                 } else {
-                    field.material.emissive.set(0xff0000);
+                    if (shouldIPaint) field.material.emissive.set(0xff0000);
                     field.userData.legal = true;
-                    legalMoves.push(field);
+                    legalMoves.push({ row: r, column: c });
                 }
                 r += dir.dr;
                 c += dir.dc;
@@ -460,20 +479,23 @@ export class Pawn extends Piece {
         super(type, color, row, column, mesh,fieldArray);
     }
 
-    move_rules(board, fieldArray) {
+
+    move_rules(chessScene, shouldIPaint) {
+        const board = chessScene.board
+        const fieldArray = chessScene.fieldArray
         const legalMoves = [];
         const direction = this.color === "white" ? 1 : -1;
         const startRow = this.color === "white" ? 1 : 6;
 
         let fieldAhead = board.children[(this.row + direction) * 8 + this.column];
         if (!fieldAhead.userData.piece_on) {
-            fieldAhead.material.emissive.set(0xff0000);
+            if (shouldIPaint) fieldAhead.material.emissive.set(0xff0000);
             fieldAhead.userData.legal = true;
 
             if (this.row === startRow) {
                 let secondFieldAhead = board.children[(this.row + 2 * direction) * 8 + this.column];
                 if (!secondFieldAhead.userData.piece_on) {
-                    secondFieldAhead.material.emissive.set(0xff0000);
+                    if (shouldIPaint) secondFieldAhead.material.emissive.set(0xff0000);
                     secondFieldAhead.userData.legal = true;
                 }
             }
@@ -483,21 +505,48 @@ export class Pawn extends Piece {
         for (let dc of diagonalDirections) {
             let fieldDiagonal = board.children[(this.row + direction) * 8 + (this.column + dc)];
             if (fieldDiagonal && fieldDiagonal.userData.piece_on && fieldDiagonal.userData.piece.color !== this.color) {
-                fieldDiagonal.material.emissive.set(0xff0000);
+                if (shouldIPaint) fieldDiagonal.material.emissive.set(0xff0000);
                 fieldDiagonal.userData.legal = true;
             }
         }
 
         const currentField = board.children[this.row * 8 + this.column];
-        currentField.material.emissive.set(0xff0000);
+        if (shouldIPaint) currentField.material.emissive.set(0xff0000);
         currentField.userData.legal = true;
-        legalMoves.push(currentField);
+        legalMoves.push({ row: this.row, column: this.column });
 
         return legalMoves;
     }
 }
 
+async function isKingInCheck(color, chessScene) {
+    const kingPosition = color === 'white' ? chessScene.whiteKing : chessScene.blackKing;
+    //console.log("Pozycja króla", kingPosition);
+    const { fieldArray } = chessScene;
+    //console.log("Arrayka", fieldArray);
 
+    for (let i = 0; i < fieldArray.length; i++) {
+        for (let j = 0; j < fieldArray[i].length; j++) {
+            const field = fieldArray[i][j];
+            let piece = field.piece;
+            if (piece instanceof Promise) {
+                piece = await piece;
+            }
+
+            if (piece === null || piece.type === "king") continue;
+
+            if (piece.color !== color) {
+                //console.log("checking colors")
+                const moves = await piece.move_rules(chessScene, false);
+
+                if (moves.some(move => move.row === kingPosition.row && move.column === kingPosition.column)) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
+}
 
 export class Field{
     constructor(row, column, material, mesh) {

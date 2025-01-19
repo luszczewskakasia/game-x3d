@@ -20,8 +20,8 @@ class ChessScene {
         this.click_mouse = new THREE.Vector2();
         this.move_mouse = new THREE.Vector2();
         this.draggable_obj = null;
-        // this.whiteKing = {row: 0, column: 3};
-        // this.blackKing = {row: 7, column: 3};
+        this.whiteKing = {row: 0, column: 3};
+        this.blackKing = {row: 7, column: 3};
         this.is_draggable = false;
         this.board = null;
         this.loaded_scene = false;
@@ -311,7 +311,7 @@ class ChessScene {
                     this.animations.Reset_animation()
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
-                    intersectedObject.userData.move_rules(this.board,this.fieldArray)
+                    intersectedObject.userData.move_rules(this, true)
                     this.is_draggable = true;
                     intersectedObject.userData.active = true;
                     this.change_emission(intersectedObject);
