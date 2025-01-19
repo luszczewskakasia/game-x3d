@@ -212,7 +212,7 @@ class ChessScene {
 
     handle_mouse_click(event) {
 
-        if (this.draggable_obj && this.is_draggable) {
+        if (this.draggable_obj && this.is_draggable && this.is_Animating && this.animations.ready_up) {
 
             // console.log(`Drop draggable: ${this.draggable.userData.name}`);
             // console.log(this.board);
@@ -297,7 +297,7 @@ class ChessScene {
         this.raycaster.setFromCamera(this.click_mouse, this.camera);
         const intersects = this.raycaster.intersectObjects(this.scene.children);
 
-        if ( this.draggable_obj == null && intersects.length > 0) {
+        if ( this.draggable_obj == null && intersects.length > 0 && !this.is_Animating) {
             const intersectedObject = intersects[0].object;
             // intersectedObject.userData.draggable = !intersectedObject.userData.draggable;
 

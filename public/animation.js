@@ -302,7 +302,7 @@ export class Animation {
             }
             else
             {
-                // console.log(this.ready_up, this.ready_ftf, this.ready_down)
+                console.log(this.ready_up, this.ready_ftf, this.ready_down)
                 requestAnimationFrame(animate_reset);
             }
         }
