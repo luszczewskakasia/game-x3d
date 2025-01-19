@@ -9,7 +9,50 @@ export class Clients {
         this.new_field = {row : null , col : null};
         this.name = ""
         this.color = null;
+        this.addUsername();
 
+        this.client.on('start_again', () => { 
+            document.getElementById("endGameBar").style.display = 'none';
+            this.addUsername();
+            document.getElementById("start-screen").style.display = 'flex';
+            this.board_state.create_pieces();
+
+        });
+
+        document.getElementById('restartButton').addEventListener('click', () => {
+            this.client.emit('restart');
+            console.log('Restart');
+        });
+
+        this.client.on('second_player_joined', () => {
+            // console.log("Mamy to");
+            document.getElementById("wait-container").style.display = 'none';});
+
+
+
+        this.client.on('broadcast_state_up', (gameState) => {
+            this.last_choosen = gameState
+            // console.log('Nowy stan:', gameState.row , gameState.col);
+        });
+
+        this.client.on('broadcast_state_down', (gameState) => {
+            this.new_field = gameState
+            this.board_state.Enemy_turn_update(this.last_choosen, this.new_field)
+            // console.log('Nowy stan:', gameState.row , gameState.col);
+        });
+
+        // this.client.on('broadcast_new_client', (new_player) => {
+        //      if(new_player.id < 2)
+        //      {
+
+        //      }
+        //
+        //     // console.log('Nowy stan:',  new_player.id);
+        // });
+
+    }
+
+    addUsername() {
         let username = null;
         if (username == null){
             username = prompt("Wpisz nazwę użytkownika");
@@ -32,23 +75,11 @@ export class Clients {
                 this.color = "black";
                 document.getElementById('White_resignButton').style.display = 'none';
                 document.getElementById('White_drawButton').style.display = 'none';
-                // console.log(role)
-                this.name = role
-                this.color = "white";
             } else {
                // console.log('Obserwator');
             }
         });
 
-        document.getElementById('restartButton').addEventListener('click', () => {
-            players = [];
-            this.client.emit('restart');
-            console.log('Restart');
-        });
-
-        this.client.on('second_player_joined', () => {
-            // console.log("Mamy to");
-            document.getElementById("wait-container").style.display = 'none';});
 
         this.client.on('updatePlayers', (players) => {
             if (players[0]) {
@@ -58,27 +89,6 @@ export class Clients {
               document.querySelector('.overlay-column.right .Profile_name').textContent = players[1];
             }
         });
-
-        this.client.on('broadcast_state_up', (gameState) => {
-            this.last_choosen = gameState
-            // console.log('Nowy stan:', gameState.row , gameState.col);
-        });
-
-        this.client.on('broadcast_state_down', (gameState) => {
-            this.new_field = gameState
-            this.board_state.Enemy_turn_update(this.last_choosen, this.new_field)
-            // console.log('Nowy stan:', gameState.row , gameState.col);
-        });
-
-        // this.client.on('broadcast_new_client', (new_player) => {
-        //      if(new_player.id < 2)
-        //      {
-
-        //      }
-        //
-        //     // console.log('Nowy stan:',  new_player.id);
-        // });
-
     }
 }
 
