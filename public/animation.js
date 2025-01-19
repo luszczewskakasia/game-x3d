@@ -2,10 +2,11 @@ import * as THREE from 'three';
 
 
 export class Clients {
-    constructor() {
+    constructor(board) {
 
         this.client = io();
 
+        this.board_state = board;
         this.last_choosen = {row : null , col : null};
         this.new_field = {row : null , col : null};
         this.name = ""
@@ -48,6 +49,7 @@ export class Clients {
 
         this.client.on('broadcast_state_down', (gameState) => {
             this.new_field = gameState
+            this.board_state.Enemy_turn_update(this.last_choosen, this.new_field)
             console.log('Nowy stan:', gameState.row , gameState.col);
         });
 
@@ -71,8 +73,7 @@ export class Animation {
         this.gameState = null;
     }
 
-    static second_order_model(object, params, deltaTime, is_Animating) {
-        is_Animating = true;
+    static second_order_model(object, params, deltaTime, gameState) {
         const { damping, frequency, response_factor } = params;
         let setpoint = object.userData.setPosition.clone();
         let setpointPrime = object.userData.setPositionPrime.clone();
@@ -123,7 +124,7 @@ export class Animation {
         }
     }
 
-    static Piece_up(object, is_Animating, gameState) {
+    static Piece_up(object, is_Animating, gameState,other_player) {
         if (this.gameState = null) {
             console.log(this.gameState);
         }
@@ -132,9 +133,10 @@ export class Animation {
         const animation_duration = 1.0;
         const starting_position = 0.5;
         const target_position = 2.4;
-        gameState.clients.client.emit('UPdate_game_state',{ row: object.userData.row, col: object.userData.column });
-        console.log('Podniesion', object.userData.row , object.userData.column);
-
+        if(!other_player) {
+            gameState.clients.client.emit('UPdate_game_state', {row: object.userData.row, col: object.userData.column});
+            console.log('Podniesion', object.userData.row, object.userData.column);
+        }
         const animate_up = (time) => {
             is_Animating = true;
             requestAnimationFrame(animate_up);
@@ -163,14 +165,16 @@ export class Animation {
     }
 
 
-    static Piece_down(object, is_Animating, gameState)
+    static Piece_down(object, is_Animating, gameState,other_player)
     {
         const animation_duration = 1.0;
         const starting_position = 3.0;
         const target_position = 0.5;
-        gameState.clients.client.emit('DOWNdate_game_state', { row: object.userData.row, col: object.userData.column });
-        console.log('Upadł', object.userData.row , object.userData.column);
-
+        if(!other_player)
+        {
+           gameState.clients.client.emit('DOWNdate_game_state', { row: object.userData.row, col: object.userData.column });
+           console.log('Upadł', object.userData.row , object.userData.column);
+        }
         const animate_down = (time) => {
             is_Animating = true;
             requestAnimationFrame(animate_down);
@@ -194,4 +198,19 @@ export class Animation {
         requestAnimationFrame(animate_down);
     }
 
+
+    static Enemy_move_animation(object, params, deltaTime, gameState,other_player)
+    {
+        let is_Animating = false;
+        this.Piece_up(object, is_Animating, gameState,other_player);
+
+        setTimeout(() => {
+            this.second_order_model(object, params, deltaTime, is_Animating);
+
+
+            setTimeout(() => {
+                this.Piece_down(object, is_Animating, gameState,other_player);
+            }, 1000);
+        }, 1000);
+    }
 }

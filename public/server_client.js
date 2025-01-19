@@ -26,7 +26,6 @@ client.on('role', (role) => {
 //client.on('moveDown', Animation.Piece_down(object, false, client));
 
 client.on('updatePlayers', (players) => {
-    // Aktualizacja nazw graczy w UI
     if (players[0]) {
       document.querySelector('.overlay-column.left .Profile_name').textContent = players[0];
     }

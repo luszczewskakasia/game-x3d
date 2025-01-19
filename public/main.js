@@ -33,7 +33,8 @@ class ChessScene {
             frequency: 0.4,
             response_factor: 0
         };
-        this.clients = new Clients()
+        this.second_order_done = false;
+        this.clients = new Clients(this)
 
         this.pointsBlack = 0;
         this.pointsWhite = 0;
@@ -126,7 +127,7 @@ class ChessScene {
                 const translation_z = (row - (rows - 1)/ 2) * square_size;
                 square_mesh.position.set(translation_x, 0.5, translation_z);
                 square_mesh.material.emissive = new THREE.Color(0x000000);
-                square_mesh.userData = new pieces.Field(row,col,square_mesh.material)
+                square_mesh.userData = new pieces.Field(row,col,square_mesh.material,square_mesh)
                 square_mesh.type = "Field";
                 this.fieldArray[row][col] = square_mesh.userData;
                 this.board.add(square_mesh);
@@ -249,7 +250,6 @@ class ChessScene {
                         piece.then(piece => {
                             if (!piece) {
                                 return;
-
                             }
                             const Mesh = piece.mesh;
                             if (!Mesh) {
@@ -286,7 +286,7 @@ class ChessScene {
                 this.clear_board();
                 this.change_emission(this.draggable_obj);
                 console.log("koniec")
-                Animation.Piece_down(this.draggable_obj, this.is_Animating,this)
+                Animation.Piece_down(this.draggable_obj, this.is_Animating,this,false)
                 this.draggable_obj = null;
                 return;
             }
@@ -308,7 +308,7 @@ class ChessScene {
                     (!this.turn && intersectedObject.userData.color === "black"))
                 {
                     this.draggable_obj = intersectedObject;
-                    Animation.Piece_up(this.draggable_obj,this.is_Animating, this);
+                    Animation.Piece_up(this.draggable_obj,this.is_Animating, this,false);
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece_on = false;
                     this.fieldArray[this.draggable_obj.userData.row][this.draggable_obj.userData.column].piece = null;
                     intersectedObject.userData.move_rules(this.board,this.fieldArray)
@@ -382,6 +382,49 @@ class ChessScene {
         const new_value = ((value - min_old) / (max_old - min_old)) * (max_new - min_new) + min_new;
         return Math.round(new_value);
     }
+
+    async Enemy_turn_update(last_position, new_position)
+
+    {
+        const Start_Field = this.fieldArray[last_position.row][last_position.col]
+        const Final_Field = this.fieldArray[new_position.row][new_position.col]
+        console.log(Start_Field)
+
+        var object = Start_Field.piece;
+        if (object instanceof Promise) {
+            object = await object;
+        }
+
+
+
+        this.draggable_obj = object.mesh
+
+        const obj = Final_Field.mesh
+
+        console.log(this.draggable_obj)
+        console.log(obj)
+
+
+
+        this.draggable_obj.userData.setPositionPrime = obj.position.clone().sub( this.draggable_obj.userData.setPosition.clone());
+        this.draggable_obj.userData.setPosition = obj.position.clone()
+        console.log(this.draggable_obj.mesh)
+
+        Animation.Enemy_move_animation(this.draggable_obj,{
+            damping: 2.0,
+            frequency: 1.7,
+            response_factor: 0
+        },0.05,this, true)
+
+        this.draggable_obj = Start_Field.piece
+
+
+        console.log(Final_Field)
+
+
+    }
+
+
 }
 
 const chess_scene = new ChessScene();

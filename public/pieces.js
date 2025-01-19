@@ -500,7 +500,7 @@ export class Pawn extends Piece {
 
 
 export class Field{
-    constructor(row, column, material) {
+    constructor(row, column, material, mesh) {
         this.type = "ground";
         this.row = row;
         this.column = column;
@@ -508,6 +508,7 @@ export class Field{
         this.material = material
         this.piece_on = false;
         this.piece = null;
+        this.mesh = mesh;
     }
 
 
