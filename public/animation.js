@@ -20,7 +20,6 @@ export class Clients {
 
         this.client.on('role', (role) => {
             if (role == 'player1') {
-                // document.getElementById('game-message').innerText = data.message;
                 document.querySelector('.overlay-column.left .Profile_name').textContent = username;
                 // console.log(role)
                 this.name = role
@@ -41,6 +40,12 @@ export class Clients {
             } else {
                // console.log('Obserwator');
             }
+        });
+
+        document.getElementById('restartButton').addEventListener('click', () => {
+            players = [];
+            this.client.emit('restart');
+            console.log('Restart');
         });
 
         this.client.on('second_player_joined', () => {

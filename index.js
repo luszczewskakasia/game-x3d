@@ -13,7 +13,6 @@ const io = new Server(server);
 
 let players = [];
 let observer = [];
-let currentPlayerIndex = 0;
 
 app.use(express.static(join(__dirname, 'public')));
 
@@ -66,6 +65,9 @@ io.on('connection', (socket) => {
     // Rozsyłanie zaktualizowanego stanu do innych klientów';
     socket.broadcast.emit('broadcast_state_down', gameState);
     });
+
+    socket.on('restart', () => {
+        players = [];});
 
 //   socket.on('moveUp', (data) => {
 //     if (players[currentPlayerIndex] === username) {
