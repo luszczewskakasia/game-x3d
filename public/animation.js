@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import * as HUD from './HUD.js';
 
 export class Clients {
     constructor(board) {
@@ -50,15 +51,6 @@ export class Clients {
             // console.log('Nowy stan:', gameState.row , gameState.col);
         });
 
-        // this.client.on('broadcast_new_client', (new_player) => {
-        //      if(new_player.id < 2)
-        //      {
-
-        //      }
-        //
-        //     // console.log('Nowy stan:',  new_player.id);
-        // });
-
     }
 
     addUsername() {
@@ -72,6 +64,7 @@ export class Clients {
             if (role == 'player1') {
                 document.querySelector('.overlay-column.left .Profile_name').textContent = username;
                 // console.log(role)
+                console.log("Gracz1");
                 this.name = role
                 this.color = "white";
                 document.getElementById('Black_resignButton').style.display = 'none';
@@ -82,6 +75,7 @@ export class Clients {
                 // console.log(role)
                 this.name = role
                 this.color = "black";
+                console.log("Gracz2");
                 document.getElementById('White_resignButton').style.display = 'none';
                 // document.getElementById('White_drawButton').style.display = 'none';
             } else {
