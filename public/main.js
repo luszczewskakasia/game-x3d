@@ -408,26 +408,25 @@ export class ChessScene {
                 object = await object;
             }
 
-            // console.log(object)
-
-            this.draggable_obj = object.mesh
-            const obj = Final_Field.mesh
-            this.animations.Enemy_move_animation(this.draggable_obj, obj,this, true)
-            this.draggable_obj = Start_Field.piece
-
             Start_Field.piece = null
             Start_Field.piece_on = false;
+            var rem_piece_mesh = null;
             if(Final_Field.piece)
             {
                 var rem_piece = Final_Field.piece;
                 if (rem_piece instanceof Promise) {
                     rem_piece = await rem_piece;
                 }
-
                 hud.addCapturedPiece(rem_piece.color, rem_piece.type,this)
-                this.board.remove(rem_piece.mesh);
-
+                rem_piece_mesh = rem_piece.mesh
             }
+
+            this.draggable_obj = object.mesh
+            const obj = Final_Field.mesh
+            this.animations.Enemy_move_animation(this.draggable_obj, obj,this, true, rem_piece_mesh)
+            this.draggable_obj = Start_Field.piece
+
+
         this.turn = !this.turn;
         Final_Field.piece = object
         Final_Field.piece_on = true

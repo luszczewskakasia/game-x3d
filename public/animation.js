@@ -21,6 +21,14 @@ export class Clients {
 
         document.getElementById('restartButton').addEventListener('click', () => {
             document.getElementById("endGameBar").style.display = 'flex';
+            const whitePlayerPoints = document.getElementById("White_Player_points");
+            while (whitePlayerPoints.firstChild) {
+                whitePlayerPoints.removeChild(whitePlayerPoints.firstChild);
+            }
+            const BlackPlayerPoints = document.getElementById("Black_Player_points");
+            while (BlackPlayerPoints.firstChild) {
+                BlackPlayerPoints.removeChild(BlackPlayerPoints.firstChild);
+            }
             this.client.emit('restart');
             console.log('Restart');
         });
@@ -67,7 +75,7 @@ export class Clients {
                 this.name = role
                 this.color = "white";
                 document.getElementById('Black_resignButton').style.display = 'none';
-                document.getElementById('Black_drawButton').style.display = 'none';
+                // document.getElementById('Black_drawButton').style.display = 'none';
 
             } else if (role == 'player2') {
                 document.getElementById("wait-container").style.display = 'none';
@@ -75,7 +83,7 @@ export class Clients {
                 this.name = role
                 this.color = "black";
                 document.getElementById('White_resignButton').style.display = 'none';
-                document.getElementById('White_drawButton').style.display = 'none';
+                // document.getElementById('White_drawButton').style.display = 'none';
             } else {
                // console.log('Obserwator');
             }
@@ -267,7 +275,7 @@ export class Animation {
         requestAnimationFrame(() => animate_down());
     }
 
-    Piece_field_to_field(object, field)
+    Piece_field_to_field(object, field,gameState,rem_piece)
     {
         const animation_duration = 3.0;
         const starting_position = object.position.clone().multiply(new THREE.Vector3(1,0,1))  ;
@@ -289,6 +297,10 @@ export class Animation {
                     object.position.z = target_position.z;
                     this.ready_ftf = true;
                     this.startTime_ftf = null;
+                    if(rem_piece)
+                    {
+                        gameState.board.remove(rem_piece);
+                    }
                     return;
                 }
                 else
@@ -330,10 +342,10 @@ export class Animation {
         requestAnimationFrame(() => animate_reset());
     }
 
-    Enemy_move_animation(object, field_obj, gameState,other_player)
+    Enemy_move_animation(object, field_obj, gameState,other_player, rem_piece)
     {
        gameState.animations.Piece_up(object, gameState,other_player);
-       gameState.animations.Piece_field_to_field(object, field_obj, gameState);
+       gameState.animations.Piece_field_to_field(object, field_obj, gameState, rem_piece);
        gameState.animations.Piece_down(object, gameState,other_player);
        gameState.animations.Reset_animation(gameState)
     }
