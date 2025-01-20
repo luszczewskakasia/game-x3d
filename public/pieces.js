@@ -48,7 +48,7 @@ export class Piece {
 
     }
 
-    move_rules(board,fieldArray) {
+    async move_rules(board,fieldArray) {
         throw new Error("Abstract method 'move_rules' must be implemented in derived class.");
     }
 
@@ -192,21 +192,28 @@ export class Queen extends Piece {
             while (r >= 0 && r < fieldArray.length && c >= 0 && c < fieldArray[r].length) {
                 let field = board.children[r * 8 + c];
 
-                const ogFieldSource = board.children[this.row * 8 + this.column];
-                const ogFieldTarget = field;
-
-                field = ogFieldSource.cloneNode(true);
-                board.children[this.row * 8 + this.column].piece_on = false;
+                // const ogTargetState = field.piece_on
+                // const ogTargetPiece = field.piece
+                // const ogSourcePiece = currentField.piece
+                //
+                // field.piece_on = true
+                // field.piece = ogSourcePiece
+                // currentField.piece_on = false
+                // currentField.piece = null
 
                 let isKingChecked = isKingInCheck(this.color, chessScene)
                 if (isKingChecked instanceof Promise) {
                     isKingChecked = await isKingChecked;
                 }
 
-                if (!isKingChecked) {
-                    field = ogFieldTarget;
-                    board.children[this.row * 8 + this.column].piece_on = true;
+                console.log("Czy jest szach: ", isKingChecked)
 
+                // field.piece_on = ogTargetState
+                // field.piece = ogTargetPiece
+                // currentField.piece_on = true
+                // currentField.piece = ogSourcePiece
+
+                //if (!isKingChecked) {
                     if (field.userData.piece_on) {
                         if (field.userData.piece.color == this.color) {
                             console.log(field.userData.piece.color)
@@ -223,13 +230,10 @@ export class Queen extends Piece {
                         field.userData.legal = true;
                         legalMoves.push({row: r, column: c});
                     }
-                    r += dir.dr;
-                    c += dir.dc;
-                } else {
-                    field = ogFieldTarget;
-                    board.children[this.row * 8 + this.column].piece_on = true;
-                }
+                //}
 
+                r += dir.dr;
+                c += dir.dc;
 
             }
         }
@@ -274,7 +278,8 @@ export class King extends Piece {
                 }
 
                 if (piece && piece.color === opponentColor && piece.type !== "king") {
-                    const moves = piece.move_rules(board, fieldArray);
+                    const moves = await  piece.move_rules(board, fieldArray);
+                    console.log("Ruchy: ", moves)
                     moves.forEach(move => opponentMoves.add(move.userData.row * 8 + move.userData.column));
                 }
             }
@@ -399,14 +404,6 @@ export class Rook extends Piece {
         currentField.userData.legal = true;
         if (shouldIPaint) currentField.material.emissive.set(0xff0000);
 
-        let isKingChecked = isKingInCheck(this.color, chessScene)
-        if (isKingChecked instanceof Promise) {
-            isKingChecked = await isKingChecked;
-        }
-        if (isKingChecked) return legalMoves;
-
-        //console.log(this.color);
-
         const directions = [
             { dr: -1, dc: 0 },  // up
             { dr: 1, dc: 0 },   // down
@@ -508,7 +505,7 @@ export class Pawn extends Piece {
     }
 
 
-    move_rules(chessScene, shouldIPaint) {
+    async move_rules(chessScene, shouldIPaint) {
         const board = chessScene.board
         const fieldArray = chessScene.fieldArray
         const legalMoves = [];
@@ -560,16 +557,17 @@ async function isKingInCheck(color, chessScene) {
             if (piece instanceof Promise) {
                 piece = await piece;
             }
-
+            //
             if (piece === null || piece.type === "king") continue;
-
+            //
             if (piece.color !== color) {
-                //console.log("checking colors")
-                const moves = await piece.move_rules(chessScene, false);
+                 console.log("checking colors")
+                 const moves = piece.move_rules(chessScene, false);
 
-                if (moves.some(move => move.row === kingPosition.row && move.column === kingPosition.column)) {
-                    return true;
-                }
+            //
+            //     if (moves.some(move => move.row === kingPosition.row && move.column === kingPosition.column)) {
+            //         return true;
+            //     }
             }
         }
     }
