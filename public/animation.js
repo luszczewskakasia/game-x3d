@@ -35,20 +35,17 @@ export class Clients {
         });
 
         this.client.on('second_player_joined', () => {
-            // console.log("Mamy to");
             document.getElementById("wait-container").style.display = 'none';});
 
 
 
         this.client.on('broadcast_state_up', (gameState) => {
             this.last_choosen = gameState
-            // console.log('Nowy stan:', gameState.row , gameState.col);
         });
 
         this.client.on('broadcast_state_down', (gameState) => {
             this.new_field = gameState
             this.board_state.Enemy_turn_update(this.last_choosen, this.new_field)
-            // console.log('Nowy stan:', gameState.row , gameState.col);
         });
 
     }
@@ -63,7 +60,6 @@ export class Clients {
         this.client.on('role', (role) => {
             if (role == 'player1') {
                 document.querySelector('.overlay-column.left .Profile_name').textContent = username;
-                // console.log(role)
                 console.log("Gracz1");
                 this.name = role
                 this.color = "white";
@@ -72,14 +68,13 @@ export class Clients {
 
             } else if (role == 'player2') {
                 document.getElementById("wait-container").style.display = 'none';
-                // console.log(role)
                 this.name = role
                 this.color = "black";
                 console.log("Gracz2");
                 document.getElementById('White_resignButton').style.display = 'none';
                 // document.getElementById('White_drawButton').style.display = 'none';
             } else {
-               // console.log('Obserwator');
+               console.log('Obserwator');
             }
         });
 
@@ -177,7 +172,7 @@ export class Animation {
         if(!other_player) {
             gameState.clients.client.emit('UPdate_game_state',
                 {row: object.userData.row, col: object.userData.column});
-            //console.log('Podniesion', object.userData.row, object.userData.column);
+            //console.log('Up', object.userData.row, object.userData.column);
         }
 
         const animate_up = (time) => {
@@ -230,7 +225,7 @@ export class Animation {
         {
            gameState.clients.client.emit('DOWNdate_game_state',
                { row: object.userData.row, col: object.userData.column });
-           //console.log('Upadł', object.userData.row , object.userData.column);
+           //console.log('Down', object.userData.row , object.userData.column);
         }
         const animate_down = (time) => {
             if(this.ready_up && this.ready_ftf && !this.ready_down)

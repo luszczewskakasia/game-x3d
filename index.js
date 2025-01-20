@@ -20,13 +20,9 @@ app.get('/', (req, res) => {
   res.sendFile(join(__dirname, 'public/index.html'));
 });
 
-// słucha sobie połączeń między klientami na serwer
 io.on('connection', (socket) => {
   let username = null;
-
-  // czeka na dostanie imienia które jest emitowane od tego klienta (socket)
-  // połączenie  do konkretnego klienta z serwera hosta
-  // instancja do konkretnego klienta
+  
   socket.on('username', (name) => {
     username = name;
     if (players.length >= 2){
@@ -47,20 +43,17 @@ io.on('connection', (socket) => {
 
     if (players.length === 2) {
         socket.broadcast.emit('second_player_joined');
-        console.log("dowiezion");
     }
 
     });
 
     socket.on('UPdate_game_state', (gameState) => {
     console.log('Podniesion:', gameState.row,gameState.col );
-    // Rozsyłanie zaktualizowanego stanu do innych klientów
     socket.broadcast.emit('broadcast_state_up', gameState);
     });
 
     socket.on('DOWNdate_game_state', (gameState) => {
     console.log('Upadł:', gameState.row,gameState.col );
-    // Rozsyłanie zaktualizowanego stanu do innych klientów';
     socket.broadcast.emit('broadcast_state_down', gameState);
     });
 
