@@ -192,43 +192,41 @@ export class Queen extends Piece {
             while (r >= 0 && r < fieldArray.length && c >= 0 && c < fieldArray[r].length) {
                 let field = board.children[r * 8 + c];
 
-                // const ogTargetState = field.piece_on
-                // const ogTargetPiece = field.piece
-                // const ogSourcePiece = currentField.piece
-                //
-                // field.piece_on = true
-                // field.piece = ogSourcePiece
-                // currentField.piece_on = false
-                // currentField.piece = null
+                const ogTargetState = field.piece_on
+                const ogTargetPiece = field.piece
+                const ogSourcePiece = currentField.piece
 
-                let isKingChecked = isKingInCheck(this.color, chessScene)
-                if (isKingChecked instanceof Promise) {
-                    isKingChecked = await isKingChecked;
-                }
+                field.piece_on = true
+                field.piece = ogSourcePiece
+                currentField.piece_on = false
+                currentField.piece = null
+
+                let isKingChecked = false
+                if (shouldIPaint) isKingChecked = await isKingInCheck(this.color, chessScene)
 
                 console.log("Czy jest szach: ", isKingChecked)
 
-                // field.piece_on = ogTargetState
-                // field.piece = ogTargetPiece
-                // currentField.piece_on = true
-                // currentField.piece = ogSourcePiece
+                field.piece_on = ogTargetState
+                field.piece = ogTargetPiece
+                currentField.piece_on = true
+                currentField.piece = ogSourcePiece
 
                 //if (!isKingChecked) {
                     if (field.userData.piece_on) {
                         if (field.userData.piece.color == this.color) {
-                            console.log(field.userData.piece.color)
+                            //console.log(field.userData.piece.color)
                             field.userData.legal = false;
                             break;
                         } else {
                             if (shouldIPaint) field.material.emissive.set(0xff0000);
                             field.userData.legal = true;
-                            legalMoves.push({row: r, column: c});
+                            legalMoves.push({row: field.row, column: field.column});
                             break;
                         }
                     } else {
                         if (shouldIPaint) field.material.emissive.set(0xff0000);
                         field.userData.legal = true;
-                        legalMoves.push({row: r, column: c});
+                        legalMoves.push({row: field.row, column: field.column});
                     }
                 //}
 
@@ -278,31 +276,33 @@ export class King extends Piece {
                 }
 
                 if (piece && piece.color === opponentColor && piece.type !== "king") {
-                    const moves = await  piece.move_rules(board, fieldArray);
-                    console.log("Ruchy: ", moves)
-                    moves.forEach(move => opponentMoves.add(move.userData.row * 8 + move.userData.column));
+                    const moves = await piece.move_rules(chessScene, false);
+                    moves.forEach(move => {
+                        const key = `${move.row},${move.column}`; // Tworzenie unikalnego klucza
+                        opponentMoves.add(key);
+                    });
                 }
             }
         }
 
-        console.log(opponentMoves);
+        //console.log("Ruchy przeciwnika: ", opponentMoves);
 
         for (let i = 0; i < board.children.length; i++) {
             if (board.children[i].type === "Field") {
                 const field = board.children[i];
                 const targetRow = field.userData.row;
                 const targetColumn = field.userData.column;
-                const fieldKey = targetRow * 8 + targetColumn;
+                const fieldKey = {row: targetRow, column: targetColumn};
 
-                console.log("numer ", fieldKey, " ?: ", opponentMoves.has(fieldKey));
+                //console.log("numer ", fieldKey, " ?: ", opponentMoves.has(fieldKey));
 
-                field.userData.legal = false;
-                field.material.emissive.set(0x000000);
+                // field.userData.legal = false;
+                // field.material.emissive.set(0x000000);
 
                 if (targetRow === this.row && targetColumn === this.column) {
                     field.userData.legal = true;
                     if (shouldIPaint) field.material.emissive.set(0xff0000);
-                    legalMoves.push({ row: targetRow, column: targetColumn });
+                    legalMoves.push({ row: field.row, column: field.column });
                     continue;
                 }
 
@@ -310,19 +310,21 @@ export class King extends Piece {
                 const colDiff = Math.abs(targetColumn - this.column);
 
                 if (rowDiff <= 1 && colDiff <= 1) {
+                    console.log("Aktualny fieldKey: ", fieldKey, "Czy zaszachowane?: ", opponentMoves.has(fieldKey))
+                    console.log("Wszystkie ruchy ", opponentMoves)
                     if (!opponentMoves.has(fieldKey)) {
                         if (field.userData.piece_on) {
                             if (field.userData.piece.color !== this.color) {
                                 field.userData.legal = true;
                                 if (shouldIPaint) field.material.emissive.set(0xff0000);
-                                legalMoves.push({ row: targetRow, column: targetColumn });
+                                legalMoves.push({ row: field.row, column: field.column });
                             }
                         } else {
                             field.userData.legal = true;
                             if (shouldIPaint) field.material.emissive.set(0xff0000);
-                            legalMoves.push({ row: targetRow, column: targetColumn });
+                            legalMoves.push({ row: field.row, column: field.column });
                         }
-                    }
+                    }else console.log("Pole ", fieldKey, " jest zaszachowane")
                 }
             }
         }
@@ -365,7 +367,7 @@ export class Knight extends Piece {
                         targetColumn === this.column + move.col
                     ) {
                         field.userData.legal = true;
-                        legalMoves.push({ row: targetRow, column: targetColumn });
+                        legalMoves.push({ row: field.row, column: field.column });
 
                         const targetField = fieldArray[targetRow][targetColumn];
                         if (targetField.piece_on) {
@@ -424,13 +426,13 @@ export class Rook extends Piece {
                     } else {
                         if (shouldIPaint) field.material.emissive.set(0xff0000);
                         field.userData.legal = true;
-                        legalMoves.push({ row: r, column: c });
+                        legalMoves.push({ row: field.row, column: field.column });
                         break;
                     }
                 } else {
                     if (shouldIPaint) field.material.emissive.set(0xff0000);
                     field.userData.legal = true;
-                    legalMoves.push({ row: r, column: c });
+                    legalMoves.push({ row: field.row, column: field.column });
                 }
                 r += dir.dr;
                 c += dir.dc;
@@ -455,11 +457,6 @@ export class Bishop extends Piece {
         currentField.userData.legal = true;
         if (shouldIPaint) currentField.material.emissive.set(0xff0000);
 
-        let isKingChecked = isKingInCheck(this.color, chessScene)
-        if (isKingChecked instanceof Promise) {
-            isKingChecked = await isKingChecked;
-        }
-        if (isKingChecked) return legalMoves;
 
         const directions = [
             { dr: -1, dc: -1 },  // up-left
@@ -481,13 +478,13 @@ export class Bishop extends Piece {
                     } else {
                         if (shouldIPaint) field.material.emissive.set(0xff0000);
                         field.userData.legal = true;
-                        legalMoves.push({ row: r, column: c });
+                        legalMoves.push({ row: field.row, column: field.column });
                         break;
                     }
                 } else {
                     if (shouldIPaint) field.material.emissive.set(0xff0000);
                     field.userData.legal = true;
-                    legalMoves.push({ row: r, column: c });
+                    legalMoves.push({ row: field.row, column: field.column });
                 }
                 r += dir.dr;
                 c += dir.dc;
@@ -516,12 +513,14 @@ export class Pawn extends Piece {
         if (!fieldAhead.userData.piece_on) {
             if (shouldIPaint) fieldAhead.material.emissive.set(0xff0000);
             fieldAhead.userData.legal = true;
+            legalMoves.push({ row: fieldAhead.userData.row, column: fieldAhead.userData.column });
 
             if (this.row === startRow) {
                 let secondFieldAhead = board.children[(this.row + 2 * direction) * 8 + this.column];
                 if (!secondFieldAhead.userData.piece_on) {
                     if (shouldIPaint) secondFieldAhead.material.emissive.set(0xff0000);
                     secondFieldAhead.userData.legal = true;
+                    legalMoves.push({row: secondFieldAhead.userData.row, column: secondFieldAhead.userData.column });
                 }
             }
         }
@@ -532,13 +531,14 @@ export class Pawn extends Piece {
             if (fieldDiagonal && fieldDiagonal.userData.piece_on && fieldDiagonal.userData.piece.color !== this.color) {
                 if (shouldIPaint) fieldDiagonal.material.emissive.set(0xff0000);
                 fieldDiagonal.userData.legal = true;
+                legalMoves.push({ row: fieldDiagonal.userData.row, column: fieldDiagonal.userData.column });
             }
         }
 
         const currentField = board.children[this.row * 8 + this.column];
         if (shouldIPaint) currentField.material.emissive.set(0xff0000);
         currentField.userData.legal = true;
-        legalMoves.push({ row: this.row, column: this.column });
+        legalMoves.push({ row: currentField.row, column: currentField.column });
 
         return legalMoves;
     }
@@ -557,17 +557,16 @@ async function isKingInCheck(color, chessScene) {
             if (piece instanceof Promise) {
                 piece = await piece;
             }
-            //
+
             if (piece === null || piece.type === "king") continue;
-            //
+
             if (piece.color !== color) {
                  console.log("checking colors")
-                 const moves = piece.move_rules(chessScene, false);
+                 const moves = await piece.move_rules(chessScene, false);
 
-            //
-            //     if (moves.some(move => move.row === kingPosition.row && move.column === kingPosition.column)) {
-            //         return true;
-            //     }
+                if (moves.some(move => move.row === kingPosition.row && move.column === kingPosition.column)) {
+                    return true;
+                }
             }
         }
     }
