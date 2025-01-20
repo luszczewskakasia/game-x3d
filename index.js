@@ -22,7 +22,7 @@ app.get('/', (req, res) => {
 
 io.on('connection', (socket) => {
   let username = null;
-  
+
   socket.on('username', (name) => {
     username = name;
     if (players.length >= 2){
@@ -48,12 +48,12 @@ io.on('connection', (socket) => {
     });
 
     socket.on('UPdate_game_state', (gameState) => {
-    console.log('Podniesion:', gameState.row,gameState.col );
+    console.log('Up:', gameState.row,gameState.col );
     socket.broadcast.emit('broadcast_state_up', gameState);
     });
 
     socket.on('DOWNdate_game_state', (gameState) => {
-    console.log('Upadł:', gameState.row,gameState.col );
+    console.log('Down:', gameState.row,gameState.col );
     socket.broadcast.emit('broadcast_state_down', gameState);
     });
 
@@ -61,7 +61,6 @@ io.on('connection', (socket) => {
     socket.on('restart', () => {
       console.log('Restart triggered by:', username);
       players = [];
-      console.log(players);
       io.emit('start_again');
     });
 

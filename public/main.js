@@ -267,16 +267,6 @@ export class ChessScene {
                             this.board.remove(Mesh);
                         }
                     }
-                    // if (piece.piece == "king"){
-                    //     switch (piece.color) {
-                    //         case "white":
-                    //             this.whiteKing = {row, col}
-                    //             break;
-                    //         case "black":
-                    //             this.blackKing = {row, col}
-                    //             break;
-                    //     }
-                    // }
                 }
                 this.fieldArray[row][col].piece_on = true;
                 this.fieldArray[row][col].piece = this.draggable_obj.userData
@@ -287,7 +277,6 @@ export class ChessScene {
 
                 this.clear_board();
                 this.change_emission(this.draggable_obj);
-                //console.log("koniec")
                 this.animations.Piece_down(this.draggable_obj,this,false)
                 this.draggable_obj = null;
                 return;
@@ -302,8 +291,6 @@ export class ChessScene {
 
         if ( this.draggable_obj == null && intersects.length > 0 && !this.is_Animating) {
             const intersectedObject = intersects[0].object;
-            // intersectedObject.userData.draggable = !intersectedObject.userData.draggable;
-
 
             console.log(this.turn , this.clients.color)
 
@@ -328,9 +315,7 @@ export class ChessScene {
 
                 }
             }
-        } else {
-            // console.log('Nothing found');
-        }
+        } 
     }
 
     handle_mouse_move(event) {
@@ -351,10 +336,7 @@ export class ChessScene {
                         this.draggable_obj.userData.setPositionPrime = obj.point.clone().sub( this.draggable_obj.userData.setPosition.clone());
                         this.draggable_obj.userData.setPosition = obj.point.clone()
                     }
-                    // var setPointPrime =obj.point.clone().sub( this.draggable_obj.position.clone());
                     this.animations.second_order_model(this.draggable_obj , this.params, 0.15,this);
-                    // this.draggable_obj.position.x = obj.point.x
-                    // this.draggable_obj.position.z = obj.point.z
 
                 }
             }
@@ -432,7 +414,6 @@ export class ChessScene {
         Final_Field.piece_on = true
         this.draggable_obj = null
         }
-    // console.log(Final_Field)
     }
 
     async remove_pieces() {
@@ -479,5 +460,3 @@ export class ChessScene {
 }
 
 const chess_scene = new ChessScene();
-
-// initScene();

@@ -143,8 +143,6 @@ export class Animation {
             Pos.z += PosPrime.z * deltaTime;
             object.position.set(Pos.x, object.position.y, Pos.z);
 
-            // console.log("during_anim:", object.position.clone().sub(setpoint.clone()).length());
-
             const height_mask = new THREE.Vector3(1,0,1)
 
             const distance = object.position.clone().multiply(height_mask).sub(setpoint.clone().multiply(height_mask)).length()
@@ -319,7 +317,6 @@ export class Animation {
                 this.ready_down = false;
                 console.log(gameState)
                 gameState.is_Animating = false;
-                // console.log(this.ready_up, this.ready_ftf, this.ready_down)
                 return
             }
             else
